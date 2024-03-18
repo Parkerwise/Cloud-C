@@ -44,12 +44,8 @@ spectrum = np.average(subcube,axis=(1,2))
 
 
 with open(f"{csv_name}", "w") as spectratext:
-    spectratext.write("[")
-    for i in range(len(freq)-1):
-        spectratext.write(f"({freq[i].value}, {spectrum[i]}),")
-    spectratext.write(f"({freq[len(freq)-1].value}, {spectrum[len(freq)-1]})")
-    spectratext.write("]")
-
+    for i in range(len(freq)):
+        spectratext.write(f"\t{freq[i].value}\t{spectrum[i]}\n")
 plt.plot(freq,spectrum)
 plt.show()
 
