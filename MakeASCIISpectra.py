@@ -2,6 +2,7 @@
 #this code will produce a CSV of your spectra (in MHz) given a data cube and a source
 import astropy.io.fits as fits
 from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
 from astropy.wcs import WCS                 
 from astropy import units as u  
 import numpy as np
@@ -43,7 +44,13 @@ spectrum = np.average(subcube,axis=(1,2))
 
 
 with open(f"{csv_name}", "w") as spectratext:
-    for i in range(len(freq)):
-        spectratext.write(f"{freq[i].value}, {spectrum[i]} \n")
+    spectratext.write("[")
+    for i in range(len(freq)-1):
+        spectratext.write(f"({freq[i].value}, {spectrum[i]}),")
+    spectratext.write(f"({freq[len(freq)-1].value}, {spectrum[len(freq)-1]})")
+    spectratext.write("]")
+
+plt.plot(freq,spectrum)
+plt.show()
 
 
