@@ -1,0 +1,4 @@
+% Number of molecules = 1
+% s_size:  T_rot:    N_tot:  V_width:   V_off:  CFFlag:   keyword:
+OCS;v=0;   3
+   48.470  300.00    5E+15      2.86   39.183        c

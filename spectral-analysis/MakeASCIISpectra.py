@@ -8,6 +8,7 @@ from astropy import units as u
 import numpy as np
 from spectral_cube import SpectralCube
 import sys
+import regions
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
@@ -16,8 +17,8 @@ if not sys.warnoptions:
 path=input("FITS File: \n")
 
 #the center of the source in pixels from where we are extracting spectra
-central_xcoord=input("Central X Coord (px): \n")
-central_ycoord=input("Central y coord (px): \n")
+central_xcoord=int(input("Central X Coord (px): \n"))
+central_ycoord=int(input("Central y coord (px): \n"))
 
 #radius of the source in pixels
 radius=int(input("Radius (px): \n"))
@@ -38,14 +39,17 @@ sc=sc.to(u.K)
 freq,Dec,Ra = sc.world[:,0,0]
 
 #defines a subcube around your source
-subcube=sc.hdu.data[:,int(central_ycoord)-radius:int(central_ycoord)+radius,int(central_xcoord)-radius:int(central_xcoord)+radius]
+#166,175, 8
+regpix = regions.CirclePixelRegion(regions.PixCoord(central_xcoord,central_ycoord), radius=radius)  
+subcube = sc.subcube_from_regions([regpix])  
+
 #averages values within subcube
-spectrum = np.average(subcube,axis=(1,2))
+spectrum = subcube.mean(axis=(1, 2))
 
 
 with open(f"{csv_name}", "w") as spectratext:
     for i in range(len(freq)):
-        spectratext.write(f"\t{freq[i].value}\t{spectrum[i]}\n")
+        spectratext.write(f"\t{freq[i].value}\t{spectrum[i].value}\n")
 plt.plot(freq,spectrum)
 plt.show()
 
