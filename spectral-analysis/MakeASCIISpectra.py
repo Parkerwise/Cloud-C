@@ -26,6 +26,7 @@ radius=int(input("Radius (px): \n"))
 
 csv_name=input("Name of new spectra file name: \n")
 
+subgroups=int(input("Number of subgroups: \n"))
 #reads in file
 sc=SpectralCube.read(path)
 sc.allow_huge_operations=True 
@@ -46,11 +47,11 @@ subcube = sc.subcube_from_regions([regpix])
 #averages values within subcube
 spectrum = subcube.mean(axis=(1, 2))
 
-
-with open(f"{csv_name}", "w") as spectratext:
-    for i in range(len(freq)):
-        spectratext.write(f"\t{freq[i].value}\t{spectrum[i].value}\n")
-plt.plot(freq,spectrum)
-plt.show()
-
+for i in range(subgroups):
+    with open(f"{csv_name}.MHz.{i}.dat", "w") as spectratext:
+        for j in range(round(len(freq)/9*i),round(len(freq)/9*(i+1))):
+            spectratext.write(f"\t{freq[j].value}\t{spectrum[j].value}\n")
+with open(f"{csv_name}.MHz.complete.dat", "w") as spectratext:
+    for j in range(len(freq)):
+        spectratext.write(f"\t{freq[j].value}\t{spectrum[j].value}\n")
 
