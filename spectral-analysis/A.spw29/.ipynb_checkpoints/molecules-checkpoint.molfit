@@ -1,0 +1,11 @@
+% Number of molecules   1
+%
+% schema:
+%
+% name of molecule   number of components
+%
+% f:  low:   up:  s_size:   f:  low:    up:   T_rot:   f:      low:        up:     N_tot:   f:  low:   up:  V_width:   f:  low:   up:   V_off:  cfFlag:
+%
+CO;v=0;   1
+   y   0.1  20.0      3.0    y  50.0  550.0    300.0    y  1.00e+14   1.00e+20   2.00e+15    y   4.0  12.0       8.0   y   -2.0  +2.0     -0.3  c
+

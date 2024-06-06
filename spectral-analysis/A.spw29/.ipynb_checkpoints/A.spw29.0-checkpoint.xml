@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExpFiles>
+
+
+   <!-- define number of experimental data file(s) -->
+   <NumberExpFiles>1</NumberExpFiles>
+
+
+   <!-- ****************************************************************** -->
+   <!-- define parameters for first file -->
+   <file>
+
+
+      <!-- define path and name of first data file -->
+      <FileNamesExpFiles>/home/parkerwise/Research/Cloud-C/spectral-analysis/A.spw29/A.spw29.MHz.0.dat</FileNamesExpFiles>
+
+
+      <!-- define import filter -->
+      <ImportFilter>xclassASCII</ImportFilter>
+
+
+      <!-- define number of frequency ranges for first data file -->
+      <NumberExpRanges>1</NumberExpRanges>
+
+      <!-- define parameters for each frequency range -->
+      <FrequencyRange>
+            <MinExpRange>97041.16</MinExpRange>
+            <MaxExpRange>97248.21</MaxExpRange>
+            <StepFrequency>1.0</StepFrequency>
+
+
+            <!-- define background temperature and temperature slope -->
+            <t_back_flag>True</t_back_flag>
+            <BackgroundTemperature>0.0</BackgroundTemperature>
+            <TemperatureSlope>0.0</TemperatureSlope>
+
+
+            <!-- define hydrogen column density, beta for dust, and kappa -->
+            <HydrogenColumnDensity>1.00E+24</HydrogenColumnDensity>
+            <DustBeta>0.0</DustBeta>
+            <Kappa>0.0</Kappa>
+      </FrequencyRange>
+
+
+      <!-- define size of telescope -->
+      <TelescopeSize>0.38</TelescopeSize>
+
+
+      <!-- define local standard of rest (vLSR) -->
+      <GlobalvLSR>0.0</GlobalvLSR>
+
+
+      <!-- define if interferrometric observation is modeled -->
+      <Inter_Flag>True</Inter_Flag>
+
+
+      <!-- define parameters for ASCII file import -->
+      <ErrorY>no</ErrorY>
+      <NumberHeaderLines>0</NumberHeaderLines>
+      <SeparatorColumns> </SeparatorColumns>
+   </file>
+
+
+   <!-- *************************************************************** -->
+   <!-- parameters for isotopologues -->
+   <!--Isotopologues>True</Isotopologues-->
+   <!--IsoTableFileName>/home/parkerwise/Research/Cloud-C/spectral-analysis/A.spw29/isonames.txt</IsoTableFileName-->
+
+
+   <!-- *********************************** -->
+   <!-- take local-overlap into account -->
+   <LocalOverlap_Flag>False</LocalOverlap_Flag>
+
+
+   <!-- **************************** -->
+   <!-- prevent sub-beam description -->
+   <NoSubBeam_Flag>True</NoSubBeam_Flag>
+</ExpFiles>
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExpFiles>
+
+
+    <!-- define number of experimental data file(s) -->
+    <NumberExpFiles>1</NumberExpFiles>
+
+
+    <!-- ************************************************************************ -->
+    <!-- define parameters for first file -->
+    <file>
+        <!-- define path and name of experimental data file -->
+		<FileNamesExpFiles>/home/parkerwise/Research/Cloud-C/spectral-analysis/12C16O/12C16O.spectra.MHz.dat</FileNamesExpFiles>
+
+
+        <!-- define import filter -->
+        <ImportFilter>ascii</ImportFilter>
+
+
+        <!-- define number of header lines -->
+        <NumberHeaderLines>0</NumberHeaderLines>
+
+
+        <!-- define character, which separate columns -->
+        <SeparatorColumns> </SeparatorColumns>
+
+
+        <!-- define number of X- and Y-columns -->
+        <NumberColumnsX>1</NumberColumnsX>
+        <NumberColumnsY>1</NumberColumnsY>
+
+
+        <!-- are errors included? -->
+        <ErrorY>no</ErrorY>
+
+
+        <!-- define number and limits of ranges -->
+        <NumberExpRanges>1</NumberExpRanges>
+        <MinExpRange>50</MinExpRange>
+        <MaxExpRange>1000</MaxExpRange>
+    </file>
+</ExpFiles>
+

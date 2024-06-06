@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModelParameters>
+
+
+    <!-- define total number of parameters -->
+    <NumberParameters>8</NumberParameters>
+
+
+    <!-- define parameter "EpsilonInfinity" -->
+    <Parameter fit="false">
+        <name>EpsilonInfinity</name>
+        <value>2.5</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>10</uplimit>
+    </Parameter>
+
+
+    <!-- define parameter "NumberOscillators" -->
+    <Parameter fit="false">
+        <name>NumberOscillators</name>
+        <value>2</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>100</uplimit>
+    </Parameter>
+
+
+    <!-- define 1st parameter "EigenFrequency" -->
+    <Parameter fit="false">
+        <name>EigenFrequency</name>
+        <value>150.0</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>1000</uplimit>
+    </Parameter>
+
+
+    <!-- define 1st parameter "PlasmaFrequency" -->
+    <Parameter fit="true">
+        <name>PlasmaFrequency</name>
+        <value>200.0</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>1000</uplimit>
+    </Parameter>
+
+
+    <!-- define 1st parameter "Damping" -->
+    <Parameter fit="true">
+        <name>Damping</name>
+        <value>10.0</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>1000</uplimit>
+    </Parameter>
+
+
+    <!-- define 2nd parameter "EigenFrequency" -->
+    <Parameter fit="false">
+        <name>EigenFrequency</name>
+        <value>600.0</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>1000</uplimit>
+    </Parameter>
+
+
+    <!-- define 2nd parameter "PlasmaFrequency" -->
+    <Parameter fit="true">
+        <name>PlasmaFrequency</name>
+        <value>400.0</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>1000</uplimit>
+    </Parameter>
+
+
+    <!-- define 2nd parameter "Damping" -->
+    <Parameter fit="true">
+        <name>Damping</name>
+        <value>10.0</value>
+        <error> </error>
+        <lowlimit>0</lowlimit>
+        <uplimit>1000</uplimit>
+    </Parameter>
+</ModelParameters>
+

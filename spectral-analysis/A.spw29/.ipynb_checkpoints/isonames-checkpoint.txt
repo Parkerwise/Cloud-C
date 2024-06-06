@@ -1,0 +1,3 @@
+% isotopologue:                         Iso-master:                              Iso-ratio:              Lower-limit:              upper-limit:
+CO-18;v=0;                              CO;v=0;                                  500
+CO-17;v=0;                              CO;v=0;                                  1500
