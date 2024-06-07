@@ -26,7 +26,7 @@ radius=int(input("Radius (px): \n"))
 
 csv_name=input("Name of new spectra file name: \n")
 
-subgroups=int(input("Number of subgroups: \n"))
+subgroups=int(input("Split your spectra into how many files?: \n"))
 #reads in file
 sc=SpectralCube.read(path)
 sc.allow_huge_operations=True 
