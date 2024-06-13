@@ -5,6 +5,7 @@ co-data/A.Dust_Ridge_sci.spw31.cube.I.pbcor.fits
 co-data/B.Dust_Ridge_12C16O_1-0.cube.I.pbcor.fits
 co-data/B.Dust_Ridge_12C17O.cube.I.pbcor.fits
 co-data/B.Dust_Ridge_sci.spw25_27_29_31.cont.I.tt0.pbcor.fits
+*.dat*
 co-data/B.Dust_Ridge_sci.spw29.cube.I.pbcor.fits
 co-data/B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits
 aces-data/cropped_Dust_Ridge_uid___A001_X15a0_X1a8.s38_0.Sgr_A_star_sci.spw25.cube.I.iter1.image.pbcor.statcont.contsub.fits
