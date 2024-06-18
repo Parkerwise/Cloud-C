@@ -1,0 +1,2 @@
+#CRTFv0 CASA Region Text Format version 0
+circle [[266.58898080deg, -28.59466026deg], 2.2400arcsec] coord=ICRS, corr=[I], linewidth=2, linestyle=-, symsize=1, symthick=1, color=2ee6d6, font=Helvetica, fontsize=10, fontstyle=normal, usetex=false, label="CoreC1ByEye", labelcolor=2ee6d6, labelpos=top
