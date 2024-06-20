@@ -12,17 +12,14 @@ from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
-path=input("FITS Path:\n")
-#width_per_plot=input("Desired width per plot (in GHz): \n")
-width_per_plot=0.25
-#regions_file=input("Regions File Path: \n")
-regions_file="c1-by-eye"
+
+path=input("FITS Path:\n") 
+width_per_plot=input("Desired width per plot (in GHz): \n")
+regions_file=input("Regions File Path: \n")
 filename=input("filename:\n")
 header=fits.getheader(path)
 w1=WCS(header)
 
-#makes figure
-#plots spectrum
 sc=SpectralCube.read(path)
 sc.allow_huge_operations=True 
 sc_Ghz=sc.with_spectral_unit(u.GHz)
@@ -33,15 +30,10 @@ regpix = Regions.read(regions_file)
 subcube = sc_Ghz.subcube_from_regions([regpix[0]])  
 spectrum = subcube.mean(axis=(1, 2))
 
-#calculate channels from frequency range
 channel_width=freq[1].value-freq[0].value
-print("channel width: ",channel_width)
 full_width=freq[-1].value-freq[0].value
-print("full width: ",full_width)
 channels_per_window=math.ceil(width_per_plot/channel_width)
-print("channels per window: ",channels_per_window)
 number_of_windows=math.ceil(full_width/width_per_plot)
-print("number of windows: ", number_of_windows)
 fig1=pylab.figure(1,figsize=(15,2*number_of_windows))
 for i in range(number_of_windows):
     if i+1 != number_of_windows:
@@ -66,7 +58,7 @@ for i in range(number_of_windows):
 fig1.supxlabel("Frequency (GHz)", fontsize=10) 
 fig1.supylabel('Brightness Temp. (K)',fontsize=10)
 plt.rcParams['text.usetex'] = True
-#fig1.tight_layout(rect=[0.005, 0, 1, 0.001])
+fig1.tight_layout(rect=[0.005, 0, 1, 0.001])
 plt.savefig(f"{filename}.divided.pdf")
 plt.savefig(f"{filename}.divided.png")
 #plt.show()
