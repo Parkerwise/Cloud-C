@@ -34,6 +34,7 @@ channel_width=freq[1].value-freq[0].value
 full_width=freq[-1].value-freq[0].value
 channels_per_window=math.ceil(width_per_plot/channel_width)
 number_of_windows=math.ceil(full_width/width_per_plot)
+
 fig1=pylab.figure(1,figsize=(15,2*number_of_windows))
 for i in range(number_of_windows):
     if i+1 != number_of_windows:
