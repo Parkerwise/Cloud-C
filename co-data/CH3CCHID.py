@@ -3,14 +3,14 @@
 # Author: Parker Wise
 # Date: 2024-06-21
 # Description: fits a model to several transitions of CH3CCH in cloud 'c'
-# Python Version: 3.11.9
-import astropy.io.fits as fits  #6.1.0
-import matplotlib.pyplot as plt #3.8.0   
+# Python Version: 3.12.4
+import astropy.io.fits as fits  #7.0.0
+import matplotlib.pyplot as plt #3.9.0   
 from astropy.wcs import WCS
 from astropy import units as u  
-import pyspeckit as psk #1.03
+import pyspeckit as psk #1.0.4
 from regions import Regions #0.9
-import numpy as np #1.26.4
+import numpy as np #2.0.0
 from spectral_cube import SpectralCube #0.6.5
 import sys
 if not sys.warnoptions:
