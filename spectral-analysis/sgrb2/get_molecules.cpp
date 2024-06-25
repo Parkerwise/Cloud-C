@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        get_molecules.cpp
+// Purpose:		output python list with molecules present within sgrB2
+// Author:      Parker Wise
+// Created:     2024-06-25
+/////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <algorithm>
 #include <ostream>
@@ -5,8 +11,7 @@
 #include <fstream>
 #include <string>
 
-
-double GetFrequencies(std::string line){
+double GetFrequencies(std::string line){ 
 	std::vector<char> bytes(line.begin(), line.end());
 	bytes.push_back('\0');
 	std::string FrequencyString(bytes.begin()+60,bytes.begin()+70);
@@ -49,10 +54,6 @@ sort(AllMolecules.begin(),AllMolecules.end());
 AllMolecules.erase(std::unique(AllMolecules.begin(),AllMolecules.end()),AllMolecules.end());
 }
 MoleculeList.close();
-std::string Filename;
-std::cout<<"Name of output File: \n";
-std::cin >> Filename;
-std::ofstream ObservedMolecules(Filename);
 std::string SelectedMolecules = "[";
 std::string FinalMolecule=AllMolecules.back();
 for (std::string i : AllMolecules){
@@ -62,8 +63,7 @@ for (std::string i : AllMolecules){
 	}
 }
 SelectedMolecules.append("]");
-ObservedMolecules << SelectedMolecules;
-ObservedMolecules.close();
+std::cout<<SelectedMolecules;
 return 0;
 }
 
