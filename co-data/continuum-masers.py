@@ -67,29 +67,28 @@ plt.annotate('Continuum',fontsize=15,xy=(0.02,0.91),xycoords="axes fraction")
 
 #masers
 df = pd.read_csv('masers.csv',header=2) #header skips over comments
-dist=8.2*10**3 
 pixScale=0.28 # asec per pixel
 def asec2pix(asec):
     return asec/pixScale
+
 def coord2pixel(l,b):
     skycoord = SkyCoord(l, b, unit="deg", frame="galactic")
     pixelcoord=skycoord.to_pixel(wcs_out,0,mode="wcs")
-    x_pixel=pixelcoord[0]
-    y_pixel=pixelcoord[1]
-    return x_pixel,y_pixel
+    return pixelcoord[0],pixelcoord[1] #returns x, y positions
 
 positions=[coord2pixel(df.l[i],df.b[i]) for i in range(len(df.l))]
 l_err=[asec2pix(sigma_l) for sigma_l in df.sigma_l]
 b_err=[asec2pix(sigma_b) for sigma_b in df.sigma_b]
-vel=np.asarray([39.6, 36.7, 64.8, 63.2, 38.0, 78.8, 9.5, 24.4, 32.3, 37.3, 40.4, 52.5, 36.0])
+
+
 x=[positions[i][0] for i in range(len(positions))]
 y=[positions[i][1] for i in range(len(positions))]
+
 cmap=plt.cm.jet
 markers=["p", "o", "^", "v", "D", "s","s","s","s","s","s","s", "*"]
 norm = colors.Normalize(vmin=9, vmax=80)
-for x,y,velocity,mark,l_err,b_err in zip(x,y,vel,markers,l_err,b_err):
-    print(velocity)
-    sc = plt.scatter(x=x,y=y,c=cmap(norm(velocity)),s = 80 ,marker = mark,zorder=1,alpha=0.75)
+for x,y,vel,mark,l_err,b_err in zip(x,y,df.velocity,markers,l_err,b_err):
+    sc = plt.scatter(x=x,y=y,c=cmap(norm(vel)),s = 80 ,marker = mark,zorder=1,alpha=0.75)
     plt.errorbar(x=x,y=y,yerr=b_err, xerr=l_err, fmt="o",zorder=0,color="black",lw=3)
 sc = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
 sc._A = np.array([norm.vmin, norm.vmax])
@@ -102,4 +101,4 @@ plt.legend()
 plt.show()
 #saves fig
 #plt.savefig("continuum.pdf",dpi=250,pad_inches=1)
-#plt.savefig("continuum.png",dpi=250,pad_inches=1)
+plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
