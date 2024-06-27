@@ -17,7 +17,7 @@ if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
 
-path="B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits"
+path="/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits"
 #spectrum is calculated for the area inside region file
 regions_file="/home/pw/research/Cloud-C/co-data/c1-by-eye" 
 header=fits.getheader(path)

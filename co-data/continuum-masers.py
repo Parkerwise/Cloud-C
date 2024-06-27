@@ -1,14 +1,18 @@
-import astropy.io.fits as fits
+# -*- coding: utf-8 -*- 
+# Author: Parker Wise
+# Date: 2024-06-27
+# Description: Plots masers onto continuum
+# Python Version: 3.11.9
+import astropy.io.fits as fits #6.1.0
 from astropy.coordinates import SkyCoord
-import pandas as pd
-from mpl_toolkits.axes_grid1 import host_subplot
-import matplotlib.pyplot as plt    
+import pandas as pd #2.2.2
+import matplotlib.pyplot as plt #3.8.0
 import matplotlib.colors as colors
 from astropy.wcs import WCS    
-from radio_beam import Beam
+from radio_beam import Beam #0.3.7
 from astropy import units as u  
-import numpy as np
-import reproject
+import numpy as np #1.26.4
+import reproject #0.13.1
 from reproject.mosaicking import find_optimal_celestial_wcs 
 import sys
 if not sys.warnoptions:
@@ -110,13 +114,13 @@ for x,y,vel,mark,l_err,b_err,name in zip(x,y,df.velocity,markers,l_err,b_err,nam
     scatter = plt.scatter(x=x,y=y,c=cmap(norm(vel)),s = 80 ,
                           marker = mark,zorder=1,alpha=0.75, label=name)
     plt.errorbar(x=x,y=y,yerr=b_err, xerr=l_err, fmt="o",zorder=0,color="black",lw=3)
-
 #ScalarMappable is needed to scale the color bar correctly
 scatter = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
 scatter._A = np.array([norm.vmin, norm.vmax])
 scatterBar=plt.colorbar(scatter,fraction=0.046,pad=0.04,ax=plt.gca())                                      
 scatterBar.set_label('Velocity (km/s)',fontsize=25,rotation=270,labelpad=30)
 plt.legend()
+
 #always save pdf and png! pdf work well in papers
 #but sometimes a png is the better option (in slideshow)
 #plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
