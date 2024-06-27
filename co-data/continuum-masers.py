@@ -14,7 +14,8 @@ import sys
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
-
+tick_font_size = 10
+plt.rcParams['text.usetex'] = True
 path ="CloudC_mJy.fits"
 image=fits.getdata(path)
 header=fits.getheader(path)
@@ -38,15 +39,16 @@ lat.display_minor_ticks(True)
 plt.xlim(80,410)
 plt.ylim(80,410)
 
-#plots beam
+#formats beam
 my_beam = Beam.from_fits_header(header)  
 ycen_pix, xcen_pix = 100, 375
 pixscale = 0.28 * u.arcsec
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
-im1 = plt.imshow(cont,cmap='Greys_r',vmax=5)
-plt.gca().add_patch(ellipse_artist)
+im1 = plt.imshow(cont,cmap='Greys_r',vmax=5) #plots continuum
+plt.gca().add_patch(ellipse_artist) #plots beam
 ellipse_artist.set_facecolor("white")
 ellipse_artist.set_edgecolor("black")
+
 
 #plots scalebar
 x=[90,180]
@@ -85,20 +87,38 @@ x=[positions[i][0] for i in range(len(positions))]
 y=[positions[i][1] for i in range(len(positions))]
 
 cmap=plt.cm.jet
-markers=["p", "o", "^", "v", "D", "s","s","s","s","s","s","s", "*"]
+#markers were made to reflect the markers used in Ginsburg 2015
+markers=["p", "o", "^", "v", "D", "s","s","s","s","s","s","s", "*"] 
+names =[ 'CH$_3$OH $7_0 - 6_1\mathrm{ A}^+$',
+          'H$_2$CO $1_{1,0}-1_{1,1}$',
+          'SiO J=1-0 v=1',
+          'SiO J=1-0 v=2',
+          'CH$_3$OH $5_1 - 6_0\mathrm{ A}^+$',
+          'H$_2$O',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'OH'
+         ]
+#to use scatter with intensity we have to normalize our data
+#vmin --> 0, vmax --> 1
 norm = colors.Normalize(vmin=9, vmax=80)
-for x,y,vel,mark,l_err,b_err in zip(x,y,df.velocity,markers,l_err,b_err):
-    sc = plt.scatter(x=x,y=y,c=cmap(norm(vel)),s = 80 ,marker = mark,zorder=1,alpha=0.75)
+for x,y,vel,mark,l_err,b_err,name in zip(x,y,df.velocity,markers,l_err,b_err,names):
+    scatter = plt.scatter(x=x,y=y,c=cmap(norm(vel)),s = 80 ,
+                          marker = mark,zorder=1,alpha=0.75, label=name)
     plt.errorbar(x=x,y=y,yerr=b_err, xerr=l_err, fmt="o",zorder=0,color="black",lw=3)
-sc = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-sc._A = np.array([norm.vmin, norm.vmax])
-cb2=plt.colorbar(sc,fraction=0.046,pad=0.04,ax=plt.gca())                                      
-cb2.set_label('Velocity (km/s)',fontsize=25,rotation=270,labelpad=30)
-cb=plt.colorbar(im1,fraction=0.046,pad=0.04)                                      
-cb.set_label(label='Flux Density (mJy / beam)',fontsize=25,rotation=270,labelpad=30) 
-cb.ax.tick_params(which = 'major', labelsize = 20) 
+
+#ScalarMappable is needed to scale the color bar correctly
+scatter = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+scatter._A = np.array([norm.vmin, norm.vmax])
+scatterBar=plt.colorbar(scatter,fraction=0.046,pad=0.04,ax=plt.gca())                                      
+scatterBar.set_label('Velocity (km/s)',fontsize=25,rotation=270,labelpad=30)
 plt.legend()
-#plt.show()
-#saves fig
-#plt.savefig("continuum.pdf",dpi=250,pad_inches=1)
-plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
+#always save pdf and png! pdf work well in papers
+#but sometimes a png is the better option (in slideshow)
+#plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
+#plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
+plt.show()
