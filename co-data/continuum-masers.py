@@ -98,7 +98,7 @@ cb=plt.colorbar(im1,fraction=0.046,pad=0.04)
 cb.set_label(label='Flux Density (mJy / beam)',fontsize=25,rotation=270,labelpad=30) 
 cb.ax.tick_params(which = 'major', labelsize = 20) 
 plt.legend()
-plt.show()
+#plt.show()
 #saves fig
 #plt.savefig("continuum.pdf",dpi=250,pad_inches=1)
 plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
