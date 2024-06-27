@@ -1,13 +1,9 @@
 import astropy.io.fits as fits
-import pylab
-import itertools
 from astropy.coordinates import SkyCoord
 import pandas as pd
-import matplotlib.colors as colors
-import copy
-import mpl_toolkits.axisartist as AA
 from mpl_toolkits.axes_grid1 import host_subplot
 import matplotlib.pyplot as plt    
+import matplotlib.colors as colors
 from astropy.wcs import WCS    
 from radio_beam import Beam
 from astropy import units as u  
@@ -70,10 +66,7 @@ ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)
 plt.annotate('Continuum',fontsize=15,xy=(0.02,0.91),xycoords="axes fraction")
 
 #masers
-
 df = pd.read_csv('masers.csv',header=2) #header skips over comments
-
-
 dist=8.2*10**3 
 pixScale=0.28 # asec per pixel
 def asec2pix(asec):
@@ -91,9 +84,9 @@ b_err=[asec2pix(sigma_b) for sigma_b in df.sigma_b]
 vel=np.asarray([39.6, 36.7, 64.8, 63.2, 38.0, 78.8, 9.5, 24.4, 32.3, 37.3, 40.4, 52.5, 36.0])
 x=[positions[i][0] for i in range(len(positions))]
 y=[positions[i][1] for i in range(len(positions))]
-cmap=pylab.cm.jet
+cmap=plt.cm.jet
 markers=["p", "o", "^", "v", "D", "s","s","s","s","s","s","s", "*"]
-norm = pylab.matplotlib.colors.Normalize(vmin=9, vmax=80)
+norm = colors.Normalize(vmin=9, vmax=80)
 for x,y,velocity,mark,l_err,b_err in zip(x,y,vel,markers,l_err,b_err):
     print(velocity)
     sc = plt.scatter(x=x,y=y,c=cmap(norm(velocity)),s = 80 ,marker = mark,zorder=1,alpha=0.75)
