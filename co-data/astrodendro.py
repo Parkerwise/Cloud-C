@@ -1,8 +1,13 @@
+#CODE IS A WORK IN PROGRESS
+
 # -*- coding: utf-8 -*- 
 # Author: Parker Wise
-# Date: 2024-06-27
-# Description: Plots masers onto continuum
+# Date: 
+# Description: 
 # Python Version: 3.11.9
+
+#librarys
+from astrodendro import Dendrogram 
 import astropy.io.fits as fits #6.1.0
 from astropy.coordinates import SkyCoord
 import pandas as pd #2.2.2
@@ -18,7 +23,9 @@ import sys
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
-tick_font_size = 10
+
+#plotting and stuff
+#formatting stuff
 plt.rcParams['text.usetex'] = True
 path ="CloudC_mJy.fits"
 image=fits.getdata(path)
@@ -71,58 +78,13 @@ plt.ylabel('Galactic Latitutude',fontsize=20,labelpad=1)
 ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)                      
 plt.annotate('Continuum',fontsize=15,xy=(0.02,0.91),xycoords="axes fraction")
 
-#masers
-df = pd.read_csv('masers.csv',header=2) #header skips over comments
-pixScale=0.28 # asec per pixel
-def asec2pix(asec):
-    return asec/pixScale
+print(type(image_2D))
+#d=dg.compute(
 
-def coord2pixel(l,b):
-    skycoord = SkyCoord(l, b, unit="deg", frame="galactic")
-    pixelcoord=skycoord.to_pixel(wcs_out,0,mode="wcs")
-    return pixelcoord[0],pixelcoord[1] #returns x, y positions
-
-positions=[coord2pixel(df.l[i],df.b[i]) for i in range(len(df.l))]
-l_err=[asec2pix(sigma_l) for sigma_l in df.sigma_l]
-b_err=[asec2pix(sigma_b) for sigma_b in df.sigma_b]
-
-
-x=[positions[i][0] for i in range(len(positions))]
-y=[positions[i][1] for i in range(len(positions))]
-
-cmap=plt.cm.jet
-#markers were made to reflect the markers used in Ginsburg 2015
-markers=["p", "o", "^", "v", "D", "s","s","s","s","s","s","s", "*"] 
-names =[ 'CH$_3$OH $7_0 - 6_1\mathrm{ A}^+$',
-          'H$_2$CO $1_{1,0}-1_{1,1}$',
-          'SiO J=1-0 v=1',
-          'SiO J=1-0 v=2',
-          'CH$_3$OH $5_1 - 6_0\mathrm{ A}^+$',
-          'H$_2$O',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          'OH'
-         ]
-#to use scatter with intensity we have to normalize our data
-#vmin --> 0, vmax --> 1
-norm = colors.Normalize(vmin=9, vmax=80)
-for x,y,vel,mark,l_err,b_err,name in zip(x,y,df.velocity,markers,l_err,b_err,names):
-    scatter = plt.scatter(x=x,y=y,c=cmap(norm(vel)),s = 80 ,
-                          marker = mark,zorder=1,alpha=0.75, label=name)
-    plt.errorbar(x=x,y=y,yerr=b_err, xerr=l_err, fmt="o",zorder=0,color="black",lw=3)
-#ScalarMappable is needed to scale the color bar correctly
-scatter = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-scatter._A = np.array([norm.vmin, norm.vmax])
-scatterBar=plt.colorbar(scatter,fraction=0.046,pad=0.04,ax=plt.gca())                                      
-scatterBar.set_label('Velocity (km/s)',fontsize=25,rotation=270,labelpad=30)
-plt.legend()
-
-#always save pdf and png! pdf work well in papers
-#but sometimes a png is the better option (in slideshow)
-plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
-plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
+#plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
+#plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
 plt.show()
+
+
+
+
