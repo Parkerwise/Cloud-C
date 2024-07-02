@@ -7,7 +7,9 @@
 # Python Version: 3.11.9
 
 #librarys
-from astrodendro import Dendrogram 
+import astrodendro
+d=astrodendro.Dendrogram.compute()
+'''
 import astropy.io.fits as fits #6.1.0
 from astropy.coordinates import SkyCoord
 import pandas as pd #2.2.2
@@ -23,7 +25,7 @@ import sys
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
-
+'''
 #plotting and stuff
 #formatting stuff
 plt.rcParams['text.usetex'] = True
@@ -79,12 +81,8 @@ ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)
 plt.annotate('Continuum',fontsize=15,xy=(0.02,0.91),xycoords="axes fraction")
 
 print(type(image_2D))
-#d=dg.compute(
-
 #plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
 #plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
-plt.show()
-
 
 
 
