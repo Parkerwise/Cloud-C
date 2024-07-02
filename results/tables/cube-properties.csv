@@ -1,10 +1,10 @@
 name, xdim, ydim, zdim, pixelScale, bmaj, bmin, bpa, channels,channelWidth,freqWidth, freqRange
-A.spw29,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1", 2.507E+0", 1.963E+0", -8.750E+1 deg, 1917,9.766E-4 GHz,1.872E+0 Hz, [9.704E+1-9.891E+1] GHz
-A.spw31,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1", 2.535E+0", 1.954E+0", -8.254E+1 deg, 1916,1.221E-4 GHz,2.339E-1 Hz, [9.891E+1-9.914E+1] GHz
-B.spw29,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1", 2.347E+0", 1.660E+0", -8.102E+1 deg, 1917,9.766E-4 GHz,1.872E+0 Hz, [1.000E+2-1.019E+2] GHz
-B.spw31,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1", 2.315E+0", 1.627E+0", -8.133E+1 deg, 1917,9.766E-4 GHz,1.872E+0 Hz, [1.018E+2-1.037E+2] GHz
-B.spw25_27_29_31,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1", 2.259E+0", 1.590E+0", -8.061E+1 deg, 1,1.525E+1 GHz,1.525E+1 Hz, [1.078E+2-1.230E+2] GHz
-A.spw25,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1", 2.246E+0", 1.735E+0", -8.825E+1 deg, 1916,1.221E-4 GHz,2.339E-1 Hz, [1.097E+2-1.099E+2] GHz
-A.spw27,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1", 2.242E+0", 1.736E+0", -8.828E+1 deg, 1917,1.221E-4 GHz,2.340E-1 Hz, [1.101E+2-1.103E+2] GHz
-B.spw27,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1", 2.132E+0", 1.488E+0", -8.082E+1 deg, 1917,1.221E-4 GHz,2.340E-1 Hz, [1.122E+2-1.125E+2] GHz
-B.spw25,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1", 2.048E+0", 1.445E+0", -7.951E+1 deg, 1917,1.221E-4 GHz,2.340E-1 Hz, [1.152E+2-1.154E+2] GHz
+A.spw29,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1 asec, 2.507E+0 asec, 1.963E+0 asec, -8.750E+1 deg, 1917,9.766E-4 GHz,1.872E+0 Hz, [9.704E+1-9.891E+1] GHz
+A.spw31,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1 asec, 2.535E+0 asec, 1.954E+0 asec, -8.254E+1 deg, 1916,1.221E-4 GHz,2.339E-1 Hz, [9.891E+1-9.914E+1] GHz
+B.spw29,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1 asec, 2.347E+0 asec, 1.660E+0 asec, -8.102E+1 deg, 1917,9.766E-4 GHz,1.872E+0 Hz, [1.000E+2-1.019E+2] GHz
+B.spw31,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1 asec, 2.315E+0 asec, 1.627E+0 asec, -8.133E+1 deg, 1917,9.766E-4 GHz,1.872E+0 Hz, [1.018E+2-1.037E+2] GHz
+B.spw25_27_29_31,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1 asec, 2.259E+0 asec, 1.590E+0 asec, -8.061E+1 deg, 1,1.525E+1 GHz,1.525E+1 Hz, [1.078E+2-1.230E+2] GHz
+A.spw25,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1 asec, 2.246E+0 asec, 1.735E+0 asec, -8.825E+1 deg, 1916,1.221E-4 GHz,2.339E-1 Hz, [1.097E+2-1.099E+2] GHz
+A.spw27,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 3.400E-1 asec, 2.242E+0 asec, 1.736E+0 asec, -8.828E+1 deg, 1917,1.221E-4 GHz,2.340E-1 Hz, [1.101E+2-1.103E+2] GHz
+B.spw27,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1 asec, 2.132E+0 asec, 1.488E+0 asec, -8.082E+1 deg, 1917,1.221E-4 GHz,2.340E-1 Hz, [1.122E+2-1.125E+2] GHz
+B.spw25,RA---SIN: deg, DEC--SIN: deg,FREQ: Hz, 2.800E-1 asec, 2.048E+0 asec, 1.445E+0 asec, -7.951E+1 deg, 1917,1.221E-4 GHz,2.340E-1 Hz, [1.152E+2-1.154E+2] GHz

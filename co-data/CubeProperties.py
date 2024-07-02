@@ -72,9 +72,9 @@ def cube_properties(path):
         pixelScale="---"
     else:
         #pixel scale is multiplied from degrees to asec
-        pixelScale=f"{Decimal(abs(header['CDELT1'])*3600):.3E}\""
-    bmaj=f"{Decimal(header['BMAJ']*3600):.3E}\""
-    bmin=f"{Decimal(header['BMIN']*3600):.3E}\""
+        pixelScale=f"{Decimal(abs(header['CDELT1'])*3600):.3E} asec"
+    bmaj=f"{Decimal(header['BMAJ']*3600):.3E} asec"
+    bmin=f"{Decimal(header['BMIN']*3600):.3E} asec"
     bpa=f"{Decimal(header['BPA']):.3E} deg"
 
     freqAxis=fetchFreqAxis(header)
@@ -86,7 +86,7 @@ def cube_properties(path):
     else:
         freqUnit=header['CUNIT'+freqAxis]
         #image is ordered in reverse: CTYPE4,CTYPE3...
-        channels=np.shape(image)[-freqAxis] 
+        channels=np.shape(image)[-int(freqAxis)] 
         #frequencies are converted to GHz instead of Hz
         startFreqVal=header['CRVAL'+freqAxis]*10**-9
         channelWidth=header['CDELT'+freqAxis]*10**-9
