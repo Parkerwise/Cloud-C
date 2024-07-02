@@ -96,7 +96,7 @@ def cube_properties(path):
         freqWidth=f"{Decimal(freqWidth):.3E} {freqUnit}"
         startFreq=f"{Decimal(float(startFreqVal)):.3E}"
         endFreq=f"{Decimal(float(endFreq)):.3E}"
-        freqRange=f"[{startFreq}-{endFreq}] G{freqUnit}"
+        freqRange=f"[{startFreq} - {endFreq}] G{freqUnit}"
         channelWidth=f"{Decimal(channelWidth):.3E} G{freqUnit}"
     return startFreqVal, f"{name},{xdim}, {ydim},{zdim}, {pixelScale}, {bmaj}, {bmin}, {bpa}, {channels},{channelWidth},{freqWidth}, {freqRange}\n"
 #csv should be sorted by ascending frequency
