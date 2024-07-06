@@ -120,9 +120,8 @@ scatter._A = np.array([norm.vmin, norm.vmax])
 scatterBar=plt.colorbar(scatter,fraction=0.046,pad=0.04,ax=plt.gca())                                      
 scatterBar.set_label('Velocity (km/s)',fontsize=25,rotation=270,labelpad=30)
 plt.legend()
-
 #always save pdf and png! pdf work well in papers
 #but sometimes a png is the better option (in slideshow)
-plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
-plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/continuum-masers.pdf",dpi=250,pad_inches=1)
+#plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
 plt.show()
