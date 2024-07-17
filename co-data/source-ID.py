@@ -77,8 +77,12 @@ plt.ylabel('Galactic Latitutude',fontsize=20,labelpad=1)
 ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)                      
 plt.annotate('Continuum',fontsize=15,xy=(0.02,0.91),xycoords="axes fraction")
 
-d=astrodendro.Dendrogram.compute(image_2D)
-v=d.viewer()
+
+sigma=0.5 #mJy/beam
+#pixel per beam (do later) 
+d=astrodendro.Dendrogram.compute(image_2D,min_value=sigma,min_delta=2*sigma)
+d.viewer()
+plt.show()
 #plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
 #plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
 
