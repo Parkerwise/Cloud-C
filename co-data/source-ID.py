@@ -7,11 +7,10 @@
 # Python Version: 3.11.9
 
 #librarys
-import astrodendro
+from astrodendro import Dendrogram, pp_catalog
 import astropy.io.fits as fits #6.1.0
 from astropy.coordinates import SkyCoord
-import pandas as pd #2.2.2
-import matplotlib.pyplot as plt #3.8.0
+import matplotlib.pyplot as plt #3.6.0
 import matplotlib.colors as colors
 from astropy.wcs import WCS    
 from radio_beam import Beam #0.3.7
@@ -38,6 +37,7 @@ wcs_out,shape_out= find_optimal_celestial_wcs([(image_2D,w1)],frame='galactic')
 cont,c_footprint = reproject.reproject_interp((image_2D,w1),wcs_out,shape_out=shape_out)
  
 #init plot and axes
+'''
 fig1 = plt.figure(1,figsize=(10,10),constrained_layout=True)       
 ax1 = plt.subplot(projection=wcs_out)             
 lon = ax1.coords[0]
@@ -76,13 +76,27 @@ plt.xlabel('Galactic Longtitude',fontsize=20,labelpad=1)
 plt.ylabel('Galactic Latitutude',fontsize=20,labelpad=1)                                  
 ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)                      
 plt.annotate('Continuum',fontsize=15,xy=(0.02,0.91),xycoords="axes fraction")
+'''
 
+def addMask(image,radius,center,remove_inside=True):
+    Y,X=np.ogrid[:350,:350] 
+    dist=np.sqrt((X-center[0])**2+(Y-center[1])**2) 
+    mask= dist <= radius
+    if remove_inside==True:
+        for (i,j),bool in np.ndenumerate(mask):
+            if bool == True:
+                image[i,j]=np.nan
+    if remove_inside==False:
+        for (i,j),bool in np.ndenumerate(mask):
+            if bool == False:
+                image[i,j]=np.nan
 
-sigma=0.5 #mJy/beam
+addMask(image_2D,110,(166,175),remove_inside=False) #crops noisy edges
+sigma=0.41 #mJy/beam
 #pixel per beam (do later) 
-d=astrodendro.Dendrogram.compute(image_2D,min_value=sigma,min_delta=2*sigma)
-d.viewer()
-plt.show()
+d=Dendrogram.compute(image_2D,min_value=sigma,min_delta=2*sigma)
+metadata={ }
+
 #plt.savefig("continuum-masers.pdf",dpi=250,pad_inches=1)
 #plt.savefig("continuum-masers.png",dpi=250,pad_inches=1)
 
