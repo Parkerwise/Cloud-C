@@ -73,8 +73,8 @@ def cube_properties(path):
     else:
         #pixel scale is multiplied from degrees to asec
         pixelScale=f"{Decimal(abs(header['CDELT1'])*3600):.3E} asec/px"
-    bmaj=f"{Decimal(header['BMAJ']*3600):.3E} asec/px"
-    bmin=f"{Decimal(header['BMIN']*3600):.3E} asec/px"
+    bmaj=f"{Decimal(header['BMAJ']*3600):.3E} asec"
+    bmin=f"{Decimal(header['BMIN']*3600):.3E} asec"
     bpa=f"{Decimal(header['BPA']):.3E} deg"
 
     freqAxis=fetchFreqAxis(header)
