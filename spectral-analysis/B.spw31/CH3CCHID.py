@@ -74,7 +74,8 @@ limited = [(True,True),(True,True),(True,True)
            ,(True,True),(True,True),(True,True)
            ,(True,True),(True,True),(True,True)]
 sp.baseline(order=1,exclude=exclude)#Fit and subtract a polynomial (order=1 -> linear) baseline
-sp.specfit(guesses=guesses,limits=limits,limited=limited)
+#sp.specfit(guesses=guesses,limits=limits,limited=limited)
+sp.specfit(guesses=guesses)
 
 
 #fig 1 shows the fit of the model to the data
@@ -135,7 +136,6 @@ plt.text(sp.specfit.parinfo[13].value-0.001,sp.specfit.parinfo[12].value+0.4,'6(
 plt.ylim(-0.5,3)
 sp.plotter.savefig('CH3CCH.png')
 sp.plotter.savefig('CH3CCH.pdf')
-
 
 #so values can be looked at later on
 with open("CH3CCH.transitions.csv", "w") as table:
