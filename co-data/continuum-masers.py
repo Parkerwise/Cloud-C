@@ -8,7 +8,7 @@ from astropy.coordinates import SkyCoord
 import pandas as pd #2.2.2
 import matplotlib.pyplot as plt #3.8.0
 import matplotlib.colors as colors
-from astropy.wcs import WCS    
+from astropy.wcs import WCS
 from radio_beam import Beam #0.3.7
 from astropy import units as u  
 import numpy as np #1.26.4
@@ -31,7 +31,7 @@ image_2D = np.squeeze(image)
 wcs_out,shape_out= find_optimal_celestial_wcs([(image_2D,w1)],frame='galactic')
 cont,c_footprint = reproject.reproject_interp((image_2D,w1),wcs_out,shape_out=shape_out)
  
-#init plot and axes
+# init plot and axes
 fig1 = plt.figure(1,figsize=(10,10),constrained_layout=True)       
 ax1 = plt.subplot(projection=wcs_out)             
 lon = ax1.coords[0]
