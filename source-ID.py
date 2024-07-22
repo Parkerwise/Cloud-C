@@ -1,11 +1,10 @@
-# CODE IS A WORK IN PROGRESS
-
-# -*- coding: utf-8 -*-
-# Author: Parker Wise
-# Date:
-# Description:
-# Python Version: 3.11.9
-
+'''
+-*- coding: utf-8 -*-
+Author: Parker Wise
+Date: 07-21-2024
+Description: ID's structures in Cloud c
+Python Version: 3.11.9
+'''
 # librarys
 from radio_beam import Beam  # 0.3.7
 from astrodendro.plot import DendrogramPlotter
@@ -24,7 +23,7 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 # Importing image
-path = "CloudC_mJy.fits"
+path = "/home/pw/research/Cloud-C/co-data/CloudC_mJy.fits"
 image = fits.getdata(path)
 header = fits.getheader(path)
 w1 = WCS(header)
@@ -69,13 +68,15 @@ catalogMetadata['spatial_scale'] = 0.28 * u.arcsec
 catalogMetadata['beam_major'] = 2.259 * u.arcsec  # FWHM
 catalogMetadata['beam_minor'] = 1.590 * u.arcsec  # FWHM
 cloudCatalog = pp_catalog(cloudDendrogram, catalogMetadata)
-cloudCatalog.write('CloudC-catalog.csv', format='ascii.csv', overwrite=True)
-cloudCatalog.write('CloudC-catalog.ecsv', format='ascii.ecsv', overwrite=True,
-                   delimiter=',')
-# catalog can be saved many different ways. See ASCII tables in astropy docs
-# cat.write('CloudC-catalog.fits', format='fits', overwrite=True)
-# cat.write('CloudC-catalog.tex', format='ascii.latex', overwrite=True)
-
+cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
+                   format='ascii.csv', overwrite=True)
+cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
+                   format='ascii.ecsv', overwrite=True, delimiter=',')
+'''
+catalog can be saved many different ways. See ASCII tables in astropy docs
+cat.write('CloudC-catalog.fits', format='fits', overwrite=True)
+cat.write('CloudC-catalog.tex', format='ascii.latex', overwrite=True)
+'''
 cloudPlots = DendrogramPlotter(cloudDendrogram)  # plotter instance
 
 # Dendrogram Plot
@@ -85,18 +86,19 @@ cloudPlots.plot_tree(dendrogramAx)
 dendrogramAx.set_xlabel("Structure")
 dendrogramAx.set_ylabel("Flux")
 dendrogramAx.set_ylim(0, 15)
-plt.savefig("CloudC-dendrogram.pdf")
-plt.savefig("CloudC-dendrogram.png")
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-dendrogram.pdf")
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-dendrogram.png")
 
 # continuum and contour plot
 continuumFigure = plt.figure(1, figsize=(14, 14), constrained_layout=True)
 continuumAx = continuumFigure.add_subplot(111, projection=wcs_out)
-# structures were plotted as contours
-# each dendrogram level is associated with a color
-# if dendrogram has more than 6 levels, more colors must be specified
-# this same affect can be achieved with many levels if you use a color map
-# this was done previously in commit 564d8e2
-
+'''
+structures were plotted as contours
+each dendrogram level is associated with a color
+if dendrogram has more than 6 levels, more colors must be specified
+this same affect can be achieved with many levels if you use a color map
+this was done previously in commit 564d8e2
+'''
 colors = ["red", "orange", "yellow", "green", "cyan", "purple"]
 for structure in cloudDendrogram:
     currentLevel = structure.level
@@ -116,7 +118,7 @@ my_beam = Beam.from_fits_header(header)
 ycen_pix, xcen_pix = 100, 375  # location of beam on plot
 pixscale = 0.28 * u.arcsec
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
-continuumImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)  # plots continuum
+continuumImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)
 plt.gca().add_patch(ellipse_artist)  # plots beam
 ellipse_artist.set_facecolor("white")
 ellipse_artist.set_edgecolor("black")
@@ -144,7 +146,5 @@ plt.xlabel('Galactic Longtitude', fontsize=20, labelpad=1)
 plt.ylabel('Galactic Latitutude', fontsize=20, labelpad=1)
 continuumAx.tick_params(axis='both', which='major', labelsize=15)
 plt.annotate('Continuum', fontsize=15, xy=(0.02, 0.91), xycoords="axes fraction")
-plt.savefig("CloudC-structure-contours.pdf")
-plt.savefig("CloudC-structure-contours.png")
-# plt.savefig("continuum-masers.pdf", dpi=250,pad_inches=1)
-# plt.savefig("continuum-masers.png", dpi=250,pad_inches=1)
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-contours.pdf")
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-contours.png")
