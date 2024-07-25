@@ -68,6 +68,7 @@ catalogMetadata['spatial_scale'] = 0.28 * u.arcsec
 catalogMetadata['beam_major'] = 2.259 * u.arcsec  # FWHM
 catalogMetadata['beam_minor'] = 1.590 * u.arcsec  # FWHM
 cloudCatalog = pp_catalog(cloudDendrogram, catalogMetadata)
+print(cloudCatalog)
 cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
                    format='ascii.csv', overwrite=True)
 cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
