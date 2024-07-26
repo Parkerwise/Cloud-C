@@ -76,10 +76,10 @@ fig1.supxlabel("Frequency (GHz)", fontsize=10)
 fig1.supylabel('Brightness Temp. (K)', fontsize=10)
 plt.legend(fontsize=14, loc="upper left")
 plt.tight_layout()  # Adjust params to avoid overlap and decrease white space
-plt.show()
-# Saving figures
 # good to save as both png and pdf
 '''
-plt.savefig(f"{filename}.divided.pdf")
-plt.savefig(f"{filename}.divided.png")
+plt.savefig("spectra.png")
+plt.savefig("spectra.pdf")
 '''
+plt.show()
+# Saving figures
