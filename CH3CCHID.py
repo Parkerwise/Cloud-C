@@ -50,7 +50,7 @@ error = error + meas
 sp = psk.Spectrum(data=zoom_spectrum, xarr=zoom_freq, error=error, unit='K')
 
 # line rich regions to exclude when calculating baseline
-exclude = np.array([102.47,102.56])
+exclude = np.array([102.47, 102.56])
 
 # heights and line widths were guessed by eye
 # freqs were calculated for the transitions of CH3CCH at 40 km/s
@@ -97,8 +97,8 @@ plt.text(sp.specfit.parinfo[7].value-0.001,sp.specfit.parinfo[6].value+0.4,'6(2)
 plt.text(sp.specfit.parinfo[10].value-0.001,sp.specfit.parinfo[9].value+0.4,'6(3)-5(3)',rotation='vertical',color='green')
 plt.text(sp.specfit.parinfo[13].value-0.001,sp.specfit.parinfo[12].value+0.4,'6(4)-5(4)',rotation='vertical',color='green')
 plt.ylim(-0.1,3)
-sp.plotter.savefig('CH3CCH.fit.png')
-sp.plotter.savefig('CH3CCH.fit.pdf')
+sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.fit.png')
+sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.fit.pdf')
 
 # fig 2 shows each component
 fig2 = plt.figure(2, figsize=(10, 5), dpi=250)
@@ -116,8 +116,8 @@ plt.text(sp.specfit.parinfo[7].value-0.001,sp.specfit.parinfo[6].value+0.4,'6(2)
 plt.text(sp.specfit.parinfo[10].value-0.001,sp.specfit.parinfo[9].value+0.4,'6(3)-5(3)',rotation='vertical',color='green')
 plt.text(sp.specfit.parinfo[13].value-0.001,sp.specfit.parinfo[12].value+0.4,'6(4)-5(4)',rotation='vertical',color='green')
 plt.ylim(-0.1, 3)
-sp.plotter.savefig('CH3CCH.components.png')
-sp.plotter.savefig('CH3CCH.components.pdf')
+sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.components.png')
+sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.components.pdf')
 
 # fig 3 shows both the fit and the components
 fig3 = plt.figure(3, figsize=(10, 5), dpi=250)
@@ -136,14 +136,13 @@ plt.text(sp.specfit.parinfo[7].value-0.001,sp.specfit.parinfo[6].value+0.4,'6(2)
 plt.text(sp.specfit.parinfo[10].value-0.001,sp.specfit.parinfo[9].value+0.4,'6(3)-5(3)',rotation='vertical',color='green')
 plt.text(sp.specfit.parinfo[13].value-0.001,sp.specfit.parinfo[12].value+0.4,'6(4)-5(4)',rotation='vertical',color='green')
 plt.ylim(-0.5, 3)
-sp.plotter.savefig('CH3CCH.png')
-sp.plotter.savefig('CH3CCH.pdf')
-
+sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.png')
+sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.pdf')
 # so values can be looked at later on
-with open("CH3CCH.transitions.csv", "w") as table:
-    table.write('Transition,Central Freq (GHz),Amplitude (K),Width (GHz)\n')
-    table.write(f'6(0)-5(0),{sp.specfit.parinfo[1].value},{sp.specfit.parinfo[0].value},{sp.specfit.parinfo[2].value}\n')
-    table.write(f'6(1)-5(1),{sp.specfit.parinfo[4].value},{sp.specfit.parinfo[3].value},{sp.specfit.parinfo[5].value}\n')
-    table.write(f'6(2)-5(2),{sp.specfit.parinfo[7].value},{sp.specfit.parinfo[6].value},{sp.specfit.parinfo[8].value}\n')
-    table.write(f'6(3)-5(3),{sp.specfit.parinfo[10].value},{sp.specfit.parinfo[9].value},{sp.specfit.parinfo[11].value}\n')
-    table.write(f'6(4)-5(4),{sp.specfit.parinfo[13].value},{sp.specfit.parinfo[12].value},{sp.specfit.parinfo[14].value}\n')
+with open("/home/pw/research/Cloud-C/results/tables/CH3CCH.transitions.csv", "w") as table:
+    table.write('Transition,Central Freq (GHz),Amplitude (K),Width (GHz), E_upper (K)\n')
+    table.write(f'6(0)-5(0),{sp.specfit.parinfo[1].value},{sp.specfit.parinfo[0].value},{sp.specfit.parinfo[2].value}, 17.22542\n')
+    table.write(f'6(1)-5(1),{sp.specfit.parinfo[4].value},{sp.specfit.parinfo[3].value},{sp.specfit.parinfo[5].value}, 24.42607\n')
+    table.write(f'6(2)-5(2),{sp.specfit.parinfo[7].value},{sp.specfit.parinfo[6].value},{sp.specfit.parinfo[8].value}, 46.02789\n')
+    table.write(f'6(3)-5(3),{sp.specfit.parinfo[10].value},{sp.specfit.parinfo[9].value},{sp.specfit.parinfo[11].value}, 82.03088\n')
+    table.write(f'6(4)-5(4),{sp.specfit.parinfo[13].value},{sp.specfit.parinfo[12].value},{sp.specfit.parinfo[14].value}, 132.43518\n')
