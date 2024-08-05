@@ -111,12 +111,12 @@ lat = continuumAx.coords[1]
 lat.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
 lon.display_minor_ticks(True)
 lat.display_minor_ticks(True)
-plt.xlim(80, 410)
-plt.ylim(80, 410)
+plt.xlim(115, 355)
+plt.ylim(115, 355)
 
 # plots beam
 my_beam = Beam.from_fits_header(header)
-ycen_pix, xcen_pix = 100, 375  # location of beam on plot
+ycen_pix, xcen_pix = 125, 340  # location of beam on plot
 pixscale = 0.28 * u.arcsec
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
 continuumImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)
@@ -126,8 +126,8 @@ ellipse_artist.set_edgecolor("black")
 
 
 # plots scale bar
-x = [90, 180]
-y = [90, 90]
+x = [120, 210]
+y = [120, 120]
 plt.plot(np.array([x[0], x[1]]), np.array([y[0], y[1]]),
          color="black", linewidth=3)
 # scale is calculated using small angle approximation
@@ -138,7 +138,7 @@ def angularSeperation(beginningPixel, endingPixel):
     endingPixel = w1.pixel_to_world(x[1], y[1])
     return beginningPixel.separation(endingPixel)
 '''
-plt.text(125, 100, '1pc', fontsize=14, color='black')
+plt.text(155, 125, '1pc', fontsize=14, color='black')
 
 # formats plot
 lon.set_ticks(size=-3)
