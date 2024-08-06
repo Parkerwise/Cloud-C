@@ -138,11 +138,28 @@ plt.text(sp.specfit.parinfo[13].value-0.001,sp.specfit.parinfo[12].value+0.4,'6(
 plt.ylim(-0.5, 3)
 sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.png')
 sp.plotter.savefig('/home/pw/research/Cloud-C/results/spectra/CH3CCH.pdf')
+
+
+def freqToVelocity(freq, path):
+    restFreq = header['RESTFRQ']*10**-9
+    return (restFreq-freq)/restFreq*3.0*10**5
+
+
+def velocityWidth(width, path, centralFreq):
+    lowerFreq = centralFreq-(width/2)
+    upperFreq = centralFreq+(width/2)
+    return freqToVelocity(lowerFreq, path)-freqToVelocity(upperFreq, path)
+
+
+central = [sp.specfit.parinfo[(3*i)+1].value for i in range(5)]
+amps = [sp.specfit.parinfo[(3*i)].value for i in range(5)]
+freqWidths = [sp.specfit.parinfo[(3*i)+2].value for i in range(5)]
+velWidths = [velocityWidth(width, path, centralFreq) for width, centralFreq in zip(freqWidths, central)]
 # so values can be looked at later on
 with open("/home/pw/research/Cloud-C/results/tables/CH3CCH.transitions.csv", "w") as table:
-    table.write('Transition,Central Freq (GHz),Amplitude (K),Width (GHz), E_upper (K)\n')
-    table.write(f'6(0)-5(0),{sp.specfit.parinfo[1].value},{sp.specfit.parinfo[0].value},{sp.specfit.parinfo[2].value}, 17.22542\n')
-    table.write(f'6(1)-5(1),{sp.specfit.parinfo[4].value},{sp.specfit.parinfo[3].value},{sp.specfit.parinfo[5].value}, 24.42607\n')
-    table.write(f'6(2)-5(2),{sp.specfit.parinfo[7].value},{sp.specfit.parinfo[6].value},{sp.specfit.parinfo[8].value}, 46.02789\n')
-    table.write(f'6(3)-5(3),{sp.specfit.parinfo[10].value},{sp.specfit.parinfo[9].value},{sp.specfit.parinfo[11].value}, 82.03088\n')
-    table.write(f'6(4)-5(4),{sp.specfit.parinfo[13].value},{sp.specfit.parinfo[12].value},{sp.specfit.parinfo[14].value}, 132.43518\n')
+    table.write('Transition,Central Freq (GHz),Amplitude (K),Width (km/s), E_upper (K)\n')
+    table.write(f'6(0)-5(0),{central[0]},{amps[0]},{velWidths[0]}, 17.22542\n')
+    table.write(f'6(1)-5(1),{central[1]},{amps[1]},{velWidths[1]}, 24.42607\n')
+    table.write(f'6(2)-5(2),{central[2]},{amps[2]},{velWidths[2]}, 46.02789\n')
+    table.write(f'6(3)-5(3),{central[3]},{amps[3]},{velWidths[3]}, 82.03088\n')
+    table.write(f'6(4)-5(4),{central[4]},{amps[4]},{velWidths[4]},132.43518\n')
