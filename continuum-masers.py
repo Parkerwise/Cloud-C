@@ -47,9 +47,9 @@ lon.display_minor_ticks(True)
 lat.display_minor_ticks(True)
 plt.xlim(80, 410)
 plt.ylim(80, 410)
+im1 = plt.imshow(cont, cmap='Greys_r', vmax=5)  # plots continuum
 
 # formats beam
-im1 = plt.imshow(cont, cmap='Greys_r', vmax=5)  # plots continuum
 my_beam = Beam.from_fits_header(header)
 ycen_pix, xcen_pix = 100, 375
 pixscale = 0.28 * u.arcsec
