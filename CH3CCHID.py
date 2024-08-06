@@ -145,6 +145,7 @@ def freqToVelocity(freq, path):
     return (restFreq-freq)/restFreq*3.0*10**5
 
 
+# calculates line width in km/s by using the central freq and freq width
 def velocityWidth(width, path, centralFreq):
     lowerFreq = centralFreq-(width/2)
     upperFreq = centralFreq+(width/2)

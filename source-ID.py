@@ -60,7 +60,8 @@ imageGalactic, c_footprint = reproject.reproject_interp((image_2D, w1),
 sigma = 0.41  # mJy/beam, std of noise
 cloudDendrogram = Dendrogram.compute(imageGalactic, min_value=sigma,
                                      min_delta=2*sigma, wcs=wcs_out)
-
+cloudDendrogram.viewer()
+plt.show()
 # Creates catalog of dendrogram structures
 catalogMetadata = {}
 catalogMetadata['data_unit'] = u.mJy / u.beam
