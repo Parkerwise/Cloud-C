@@ -49,11 +49,11 @@ plt.xlim(80, 410)
 plt.ylim(80, 410)
 
 # formats beam
+im1 = plt.imshow(cont, cmap='Greys_r', vmax=5)  # plots continuum
 my_beam = Beam.from_fits_header(header)
 ycen_pix, xcen_pix = 100, 375
 pixscale = 0.28 * u.arcsec
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
-im1 = plt.imshow(cont, cmap='Greys_r', vmax=5)  # plots continuum
 plt.gca().add_patch(ellipse_artist)  # plots beam
 ellipse_artist.set_facecolor("white")
 ellipse_artist.set_edgecolor("black")

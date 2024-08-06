@@ -56,12 +56,11 @@ imageGalactic, c_footprint = reproject.reproject_interp((image_2D, w1),
                                                         wcs_out,
                                                         shape_out=shape_out)
 
+
 # Computing Dendrogram
 sigma = 0.41  # mJy/beam, std of noise
 cloudDendrogram = Dendrogram.compute(imageGalactic, min_value=sigma,
                                      min_delta=2*sigma, wcs=wcs_out)
-cloudDendrogram.viewer()
-plt.show()
 # Creates catalog of dendrogram structures
 catalogMetadata = {}
 catalogMetadata['data_unit'] = u.mJy / u.beam
@@ -94,6 +93,7 @@ plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-dendrogram.png")
 # continuum and contour plot
 continuumFigure = plt.figure(1, figsize=(14, 14), constrained_layout=True)
 continuumAx = continuumFigure.add_subplot(111, projection=wcs_out)
+continuumImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)
 '''
 structures were plotted as contours
 each dendrogram level is associated with a color
@@ -120,7 +120,6 @@ my_beam = Beam.from_fits_header(header)
 ycen_pix, xcen_pix = 125, 340  # location of beam on plot
 pixscale = 0.28 * u.arcsec
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
-continuumImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)
 plt.gca().add_patch(ellipse_artist)  # plots beam
 ellipse_artist.set_facecolor("white")
 ellipse_artist.set_edgecolor("black")
