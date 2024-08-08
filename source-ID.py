@@ -8,8 +8,13 @@ Python Version: 3.11.9
 # librarys
 from radio_beam import Beam  # 0.3.7
 from astrodendro.plot import DendrogramPlotter
+from astrodendro.analysis import PPStatistic
 from astrodendro import Dendrogram, pp_catalog
 import astropy.io.fits as fits  # 6.1.0
+from regions import EllipseSkyRegion
+from regions import EllipsePixelRegion
+from astropy.coordinates import ICRS
+from regions import PixCoord
 # astrodendro viewer not compatible with matplotlib >= 3.7
 import matplotlib.pyplot as plt  # 3.6.0
 from astropy.wcs import WCS
@@ -47,7 +52,7 @@ def addMask(image, radius, center, remove_inside=True):
                 image[i, j] = np.nan
 
 
-addMask(image_2D, 110, (166, 175), remove_inside=False)  # crops noisy edges
+addMask(image_2D, 100, (165, 190), remove_inside=False)  # crops noisy edges
 
 # converts image to galactic coordinates
 wcs_out, shape_out = find_optimal_celestial_wcs([(image_2D, w1)],
@@ -58,9 +63,9 @@ imageGalactic, c_footprint = reproject.reproject_interp((image_2D, w1),
 
 
 # Computing Dendrogram
-sigma = 0.41  # mJy/beam, std of noise
+sigma = 0.36  # mJy/beam, std of noise
 cloudDendrogram = Dendrogram.compute(imageGalactic, min_value=sigma,
-                                     min_delta=2*sigma, wcs=wcs_out)
+                                     min_delta=1*sigma, wcs=wcs_out)
 # Creates catalog of dendrogram structures
 catalogMetadata = {}
 catalogMetadata['data_unit'] = u.mJy / u.beam
@@ -68,7 +73,6 @@ catalogMetadata['spatial_scale'] = 0.28 * u.arcsec
 catalogMetadata['beam_major'] = 2.259 * u.arcsec  # FWHM
 catalogMetadata['beam_minor'] = 1.590 * u.arcsec  # FWHM
 cloudCatalog = pp_catalog(cloudDendrogram, catalogMetadata)
-print(cloudCatalog)
 cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
                    format='ascii.csv', overwrite=True)
 cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
@@ -91,9 +95,9 @@ plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-dendrogram.pdf")
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-dendrogram.png")
 
 # continuum and contour plot
-continuumFigure = plt.figure(1, figsize=(14, 14), constrained_layout=True)
-continuumAx = continuumFigure.add_subplot(111, projection=wcs_out)
-continuumImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)
+contourFigure = plt.figure(1, figsize=(14, 14), constrained_layout=True)
+contourAx = contourFigure.add_subplot(111, projection=wcs_out)
+contourImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=10)
 '''
 structures were plotted as contours
 each dendrogram level is associated with a color
@@ -101,14 +105,15 @@ if dendrogram has more than 6 levels, more colors must be specified
 this same affect can be achieved with many levels if you use a color map
 this was done previously in commit 564d8e2
 '''
-colors = ["red", "orange", "yellow", "green", "cyan", "purple"]
+colors = ["red", "orange", "yellow", "green",
+          "cyan", "blue", "purple", "magenta", "black"]
 for structure in cloudDendrogram:
     currentLevel = structure.level
-    cloudPlots.plot_contour(continuumAx, structure=structure,
+    cloudPlots.plot_contour(contourAx, structure=structure,
                             color=colors[currentLevel])
-lon = continuumAx.coords[0]
+lon = contourAx.coords[0]
 lon.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
-lat = continuumAx.coords[1]
+lat = contourAx.coords[1]
 lat.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
 lon.display_minor_ticks(True)
 lat.display_minor_ticks(True)
@@ -118,7 +123,7 @@ plt.ylim(115, 355)
 # plots beam
 my_beam = Beam.from_fits_header(header)
 ycen_pix, xcen_pix = 125, 340  # location of beam on plot
-pixscale = 0.28 * u.arcsec
+pixscale = header['CDELT1']*3600 * u.deg
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
 plt.gca().add_patch(ellipse_artist)  # plots beam
 ellipse_artist.set_facecolor("white")
@@ -145,7 +150,81 @@ lon.set_ticks(size=-3)
 lat.set_ticks(size=-3)
 plt.xlabel('Galactic Longtitude', fontsize=20, labelpad=1)
 plt.ylabel('Galactic Latitutude', fontsize=20, labelpad=1)
-continuumAx.tick_params(axis='both', which='major', labelsize=15)
+contourAx.tick_params(axis='both', which='major', labelsize=15)
 plt.annotate('Continuum', fontsize=15, xy=(0.02, 0.91), xycoords="axes fraction")
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-contours.pdf")
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-contours.png")
+
+
+# continuum and aperture plot
+apertureFigure = plt.figure(2, figsize=(14, 14), constrained_layout=True)
+apertureAx = apertureFigure.add_subplot(111, projection=wcs_out)
+apertureImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=10)
+
+lon = apertureAx.coords[0]
+lon.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
+lat = apertureAx.coords[1]
+lat.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
+lon.display_minor_ticks(True)
+lat.display_minor_ticks(True)
+plt.xlim(115, 355)
+plt.ylim(115, 355)
+
+# plots beam
+my_beam = Beam.from_fits_header(header)
+ycen_pix, xcen_pix = 125, 340  # location of beam on plot
+pixscale = 0.28 * u.arcsec
+ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
+plt.gca().add_patch(ellipse_artist)  # plots beam
+ellipse_artist.set_facecolor("white")
+ellipse_artist.set_edgecolor("black")
+
+# plots scale bar
+x = [120, 210]
+y = [120, 120]
+plt.plot(np.array([x[0], x[1]]), np.array([y[0], y[1]]),
+         color="black", linewidth=3)
+# scale is calculated using small angle approximation
+# to get angular seperation between pixels, use this function
+'''
+def angularSeperation(beginningPixel, endingPixel):
+    beginningPixel = w1.pixel_to_world(x[0], y[0])
+    endingPixel = w1.pixel_to_world(x[1], y[1])
+    return beginningPixel.separation(endingPixel)
+'''
+plt.text(155, 125, '1pc', fontsize=14, color='black')
+# formats plot
+lon.set_ticks(size=-3)
+lat.set_ticks(size=-3)
+plt.xlabel('Galactic Longtitude', fontsize=20, labelpad=1)
+plt.ylabel('Galactic Latitutude', fontsize=20, labelpad=1)
+apertureAx.tick_params(axis='both', which='major', labelsize=15)
+plt.annotate('Continuum', fontsize=15, xy=(0.02, 0.91), xycoords="axes fraction")
+
+# aperture statistics
+fk5Regions = ''
+galRegions = ''
+for leaf in cloudDendrogram.leaves:
+    stats = PPStatistic(leaf)
+    galacticCoord = wcs_out.pixel_to_world(stats.x_cen, stats.y_cen)
+    fk5Coord = galacticCoord.fk5
+    fk5Region_sky = EllipseSkyRegion(center=fk5Coord,
+                                     height=2.3548*stats.minor_sigma.value*pixscale,
+                                     width=2.3548*stats.major_sigma.value*pixscale,
+                                     angle=stats.position_angle.value*u.deg-60.2*u.deg)
+    galacticRegion_sky = EllipseSkyRegion(center=galacticCoord,
+                                          height=2.3548*stats.minor_sigma.value*pixscale,
+                                          width=2.3548*stats.major_sigma.value*pixscale,
+                                          angle=stats.position_angle.value*u.deg)
+    fk5Regions += f'{fk5Region_sky.serialize(format="ds9",)}\n'
+    galRegions += f'{galacticRegion_sky.serialize(format="ds9",)}\n'
+    ellipse = stats.to_mpl_ellipse(edgecolor='red', facecolor='none')
+    apertureAx.add_patch(ellipse)
+
+with open("/home/pw/research/Cloud-C/fk5Regions.reg", "w") as table:
+    table.write(fk5Regions)
+with open("/home/pw/research/Cloud-C/galRegions.reg", "w") as table:
+    table.write(galRegions)
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.pdf")
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.png")
+plt.show()
