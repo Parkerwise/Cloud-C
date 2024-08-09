@@ -9,15 +9,17 @@ import astropy.io.fits as fits  # 6.1.0
 from decimal import Decimal
 import numpy as np  # 1.26.4
 
-fitsFilenames = ["/home/pw/research/Cloud-C/co-data/A.Dust_Ridge_12C18O.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/A.Dust_Ridge_13C16O.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/A.Dust_Ridge_sci.spw29.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/A.Dust_Ridge_sci.spw31.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_12C16O_1-0.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_12C17O.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_sci.spw25_27_29_31.cont.I.tt0.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_sci.spw29.cube.I.pbcor.fits",
-                 "/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits"]
+folderPath = "/home/pw/research/Cloud-C/co-data/"
+
+fitsFilenames = ["A.Dust_Ridge_12C18O.cube.I.pbcor.fits",
+                 "A.Dust_Ridge_13C16O.cube.I.pbcor.fits",
+                 "A.Dust_Ridge_sci.spw29.cube.I.pbcor.fits",
+                 "A.Dust_Ridge_sci.spw31.cube.I.pbcor.fits",
+                 "B.Dust_Ridge_12C16O_1-0.cube.I.pbcor.fits",
+                 "B.Dust_Ridge_12C17O.cube.I.pbcor.fits",
+                 "B.Dust_Ridge_sci.spw25_27_29_31.cont.I.tt0.pbcor.fits",
+                 "B.Dust_Ridge_sci.spw29.cube.I.pbcor.fits",
+                 "B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits"]
 # allows us to find header key given header value
 
 
@@ -66,9 +68,10 @@ def fetchSpatialAxes(header):
 
 
 def cube_properties(path):
-    image = fits.getdata(path) 
-    header = fits.getheader(path)
     calibration = path[0]
+    path = folderPath+path
+    image = fits.getdata(path)
+    header = fits.getheader(path)
     spectralWindow = header['FILNAM04']
     name = calibration+'.'+spectralWindow
     xdim = header['CTYPE1']+": "+header['CUNIT1']
