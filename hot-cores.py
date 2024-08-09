@@ -1,17 +1,16 @@
 '''
-WIP
-this code will make spectra for each ID'd source (see source-ID.py) and then
-quantify it's line richness (lines/GHz) in the search for hot cores which are
-line rich
+-*- coding: utf-8 -*-
+Author: Parker Wise
+Date:
+Description: make spectra for ID'd sources (see source-ID.py)
+Python Version: 3.11.9
 '''
 # code yanked from spectra script
 from astropy import units as u
 from regions import Regions
-import numpy as np
 import matplotlib.pyplot as plt
 from spectral_cube import SpectralCube
 import sys
-import regions
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
@@ -24,12 +23,14 @@ cubeList = [
     'B.Dust_Ridge_sci.spw29.cube.I.pbcor.fits',  # B29
     'B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits',  # B31
 ]
+# For naming final products/saving into results folder
 cubeAbbreviation = [
     "A.spw29",  # A29
     "A.spw31",  # A31
     "B.spw29",  # B29
     "B.spw31",  # B31
 ]
+# Loop is run on each cube we're interested in
 for cube, name in zip(cubeList, cubeAbbreviation):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
     # # creates spectral cube object
@@ -43,14 +44,12 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     # # defines our frequency as a list
     freq, Dec, Ra = sc.world[:, 0, 0]
 
-    # defines a subcube around your source
-    # # From regions file
-
+    # Regions from which spectra is extracted
     regions_file = "/home/pw/research/Cloud-C/fk5Regions.reg"
     regpix = Regions.read(regions_file)
     numberOfRegions = len(regpix)
-    # averages values within aperture for each channel
     '''
+    # Noise is not included at this moment, channels are cube dependent
     Noise_upper = 825  # defines some line free channels to calculate STD
     Noise_lower = 800
     '''
@@ -60,8 +59,7 @@ for cube, name in zip(cubeList, cubeAbbreviation):
         subcube = sc.subcube_from_regions([regpix[i]])
         spectrum = subcube.mean(axis=(1, 2))
         ax1 = plt.subplot(numberOfRegions, 1, i+1)
-        ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue",
-                 label="spectrum")
+        ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
         ax1.set_title(f"region {i}")
         '''
         sigma = np.std(spectrum[Noise_lower:Noise_upper].value)
