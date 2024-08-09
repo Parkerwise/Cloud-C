@@ -35,42 +35,40 @@ freq, Dec, Ra = sc.world[:, 0, 0]
 # defines a subcube around your source
 # # From regions file
 
-regions_file = "/home/pw/research/Cloud-C/co-data/c1-by-eye"
+regions_file = "/home/pw/research/Cloud-C/fk5Regions.reg"
 regpix = Regions.read(regions_file)
-subcube = sc.subcube_from_regions([regpix[0]])
-
+numberOfRegions = len(regpix)
 # averages values within aperture for each channel
-spectrum = subcube.mean(axis=(1, 2))
-
-
-fig1 = plt.figure(1, figsize=(15, 2), dpi=250)
-plt.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue",
-         label="spectrum")
-
-# Calculating and plotting noise, specific to your data
-# # Noise_upper to Noise_lower should be line free
+'''
 Noise_upper = 825  # defines some line free channels to calculate STD
 Noise_lower = 800
-sigma = np.std(spectrum[Noise_lower:Noise_upper].value)
-three_sigma = 3*sigma
-plt.hlines(three_sigma, freq[0].value, freq[1916].value, colors="red",
-           label='', ls="--")
-plt.hlines(-three_sigma, freq[0].value, freq[1916].value, colors="red",
-           label='', ls="--")
-plt.xlim(freq[0].value, freq[1916].value)
-plt.fill_between(freq.value, three_sigma, -three_sigma, alpha=0.2,
-                 color='red', label='Error')
+'''
 
-# Formatting plot
+fig1 = plt.figure(1, figsize=(15, 2*numberOfRegions), dpi=250)
+for i in range(numberOfRegions):
+    subcube = sc.subcube_from_regions([regpix[i]])
+    spectrum = subcube.mean(axis=(1, 2))
+    ax1 = plt.subplot(numberOfRegions, 1, i+1)
+    ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue",
+             label="spectrum")
+    ax1.set_title(f"region {i}")
+    '''
+    sigma = np.std(spectrum[Noise_lower:Noise_upper].value)
+    three_sigma = 3*sigma
+    plt.hlines(three_sigma, freq[0].value, freq[1916].value, colors="red",
+               label='', ls="--")
+    plt.hlines(-three_sigma, freq[0].value, freq[1916].value, colors="red",
+               label='', ls="--")
+    plt.xlim(freq[0].value, freq[1916].value)
+    plt.fill_between(freq.value, three_sigma, -three_sigma, alpha=0.2,
+                     color='red', label='Error')
+    '''
 fig1.supxlabel("Frequency (GHz)", fontsize=10)
 fig1.supylabel('Brightness Temp. (K)', fontsize=10)
 plt.legend(fontsize=14, loc="upper left")
 plt.tight_layout()  # Adjust params to avoid overlap and decrease white space
 # good to save as both png and pdf
-'''
-plt.savefig("spectra.png")
-plt.savefig("spectra.pdf")
-'''
-plt.show()
+plt.savefig("/home/pw/research/Cloud-C/results/spectra/line-richness.png")
+plt.savefig("/home/pw/research/Cloud-C/results/spectra/line-richness.pdf")
 # Saving figures
 
