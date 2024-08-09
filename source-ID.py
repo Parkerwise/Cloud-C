@@ -202,12 +202,21 @@ apertureAx.tick_params(axis='both', which='major', labelsize=15)
 plt.annotate('Continuum', fontsize=15, xy=(0.02, 0.91), xycoords="axes fraction")
 
 # aperture statistics
+'''
+regions files are just fancy strings, so we create an empty string
+that we can append to (remembering to add and endline at the end
+
+
+I had issues wrt position angle between fk5 and galactic, so I made one regions
+file for each frame
+'''
 fk5Regions = ''
 galRegions = ''
 for leaf in cloudDendrogram.leaves:
     stats = PPStatistic(leaf)
     galacticCoord = wcs_out.pixel_to_world(stats.x_cen, stats.y_cen)
     fk5Coord = galacticCoord.fk5
+    # 60.2 degree angular offset between frames (angle of Milky way on sky)
     fk5Region_sky = EllipseSkyRegion(center=fk5Coord,
                                      height=2.3548*stats.minor_sigma.value*pixscale,
                                      width=2.3548*stats.major_sigma.value*pixscale,
@@ -216,8 +225,9 @@ for leaf in cloudDendrogram.leaves:
                                           height=2.3548*stats.minor_sigma.value*pixscale,
                                           width=2.3548*stats.major_sigma.value*pixscale,
                                           angle=stats.position_angle.value*u.deg)
-    fk5Regions += f'{fk5Region_sky.serialize(format="ds9",)}\n'
-    galRegions += f'{galacticRegion_sky.serialize(format="ds9",)}\n'
+    fk5Regions += f'{fk5Region_sky.serialize(format="ds9")}\n'
+    galRegions += f'{galacticRegion_sky.serialize(format="ds9")}\n'
+    # different from regions files, plots ellipse onto figure
     ellipse = stats.to_mpl_ellipse(edgecolor='red', facecolor='none')
     apertureAx.add_patch(ellipse)
 
@@ -227,4 +237,3 @@ with open("/home/pw/research/Cloud-C/galRegions.reg", "w") as table:
     table.write(galRegions)
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.pdf")
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.png")
-plt.show()
