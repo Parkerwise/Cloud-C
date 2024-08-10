@@ -1,12 +1,14 @@
 '''
 -*- coding: utf-8 -*-
-Author: Parker Wise
-Date:
+Author: Parker Wise (Error and line counting by Ryan Cosgrove)
+Date: 08-10-24
 Description: make spectra for ID'd sources (see source-ID.py)
 Python Version: 3.11.9
 '''
 # code yanked from spectra script
 from astropy import units as u
+import numpy as np
+from scipy import stats as st
 from regions import Regions
 import matplotlib.pyplot as plt
 from spectral_cube import SpectralCube
@@ -30,6 +32,31 @@ cubeAbbreviation = [
     "B.spw29",  # B29
     "B.spw31",  # B31
 ]
+
+
+# Define a function to obtain the error from a given spectrum
+def getError(freq, spectrum):
+    binsize = 2
+    bin_num = len(spectrum) / binsize
+    binned_spectrum = st.binned_statistic(freq, spectrum, statistic='mean',
+                                          bins=bin_num)
+    sigma_bin = np.std(binned_spectrum.statistic)
+    prelim_error = 4 * sigma_bin  # Four sigma of binned spectrum
+    spectrum_ref = spectrum.copy()
+    for channel in range(len(spectrum)):
+        if spectrum_ref[channel].value > prelim_error or spectrum_ref[channel].value < -prelim_error:
+            spectrum_ref[channel] = 0
+    sigma_ref = np.std(spectrum_ref[0:-1].value)
+    acceptable_error = 4 * sigma_ref  # Re-calculate error after first trimming
+    spectrum_ref2 = spectrum_ref.copy()  # Copy spectrum and trim out values over error
+    for channel in range(len(spectrum)):
+        if spectrum_ref2[channel].value > acceptable_error or spectrum_ref2[channel].value < -acceptable_error:
+            spectrum_ref2[channel] = 0
+    sigma_ref2 = np.std(spectrum_ref2[0:-1].value)
+    acceptable_error2 = 4 * sigma_ref2  # Re-calculate error after second trimming
+    return acceptable_error2
+
+
 # Loop is run on each cube we're interested in
 for cube, name in zip(cubeList, cubeAbbreviation):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
@@ -48,11 +75,6 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     regions_file = "/home/pw/research/Cloud-C/fk5Regions.reg"
     regpix = Regions.read(regions_file)
     numberOfRegions = len(regpix)
-    '''
-    # Noise is not included at this moment, channels are cube dependent
-    Noise_upper = 825  # defines some line free channels to calculate STD
-    Noise_lower = 800
-    '''
 
     fig1 = plt.figure(1, figsize=(15, 2*numberOfRegions), dpi=250)
     for i in range(numberOfRegions):
@@ -61,17 +83,13 @@ for cube, name in zip(cubeList, cubeAbbreviation):
         ax1 = plt.subplot(numberOfRegions, 1, i+1)
         ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
         ax1.set_title(f"region {i}")
-        '''
-        sigma = np.std(spectrum[Noise_lower:Noise_upper].value)
-        three_sigma = 3*sigma
-        plt.hlines(three_sigma, freq[0].value, freq[1916].value, colors="red",
-                   label='', ls="--")
-        plt.hlines(-three_sigma, freq[0].value, freq[1916].value, colors="red",
-                   label='', ls="--")
-        plt.xlim(freq[0].value, freq[1916].value)
-        plt.fill_between(freq.value, three_sigma, -three_sigma, alpha=0.2,
+        spectraError = getError(freq, spectrum)
+        plt.hlines(spectraError, freq[0].value, freq[-1].value,
+                   colors="red", ls="--")
+        plt.hlines(-spectraError, freq[0].value, freq[-1].value,
+                   colors="red", ls="--")
+        plt.fill_between(freq.value, spectraError, -spectraError, alpha=0.2,
                          color='red', label='Error')
-        '''
     fig1.supxlabel("Frequency (GHz)", fontsize=10)
     fig1.supylabel('Brightness Temp. (K)', fontsize=10)
     plt.tight_layout()  # Adjust params to avoid overlap and decrease white space
