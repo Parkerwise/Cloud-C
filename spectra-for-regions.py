@@ -1,6 +1,6 @@
 '''
 -*- coding: utf-8 -*-
-Author: Parker Wise (Error and line counting by Ryan Cosgrove)
+Author: Parker Wise
 Date: 08-10-24
 Description: make spectra for ID'd sources (see source-ID.py)
 Python Version: 3.11.9
@@ -96,3 +96,4 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     # good to save as both png and pdf
     plt.savefig(f"/home/pw/research/Cloud-C/results/spectra/{name}/{name}-line-richness.png")
     plt.savefig(f"/home/pw/research/Cloud-C/results/spectra/{name}/{name}-line-richness.pdf")
+    plt.clf()  # Removes this cubes spectra so it won't be plotted on the next
