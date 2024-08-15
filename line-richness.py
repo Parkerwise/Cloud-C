@@ -16,6 +16,7 @@ if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
 
+
 # Reading in files
 # # This should be the file where we're extracting spectra
 cubeList = [
@@ -57,13 +58,35 @@ def getError(freq, spectrum):
 
 
 def countLines(freq, spectrum, error):
+
     linechannels, properties = scipy.signal.find_peaks(spectrum, height=error,
                                                        prominence=error)
+    linefreqs = freq[linechannels].value
+    lineheights = spectrum[linechannels].value
     linenumber = len(linechannels)
-    return linenumber
+    return linenumber, linefreqs, lineheights
 
 
-allEntries = []
+def generateSpectra(cube, regionsList, regionIndex):
+    subcube = cube.subcube_from_regions([regionsList[regionIndex]])
+    spectrum = subcube.mean(axis=(1, 2))
+    spectraError = getError(freq, spectrum)
+    return spectrum, spectraError
+
+
+def linesTable(name, linefreqs, lineheights):
+    dict = {
+        f'{name} lines': {
+            f'line {i}': {
+                'central freq': freq,
+                'line height': height
+            } for i, (freq, height) in enumerate(zip(linefreqs, lineheights))
+        }
+    }
+    return dict
+
+
+c1Lines = {}
 # Loop is run on each cube we're interested in
 for cube, name in zip(cubeList, cubeAbbreviation):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
@@ -83,53 +106,17 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     regpix = Regions.read(regions_file)
     numberOfRegions = len(regpix)
 
-    csvHeader = 'cube names'
-    entry = f'{name}'
+    # Calculate lines towards core C1
+    c1Spectrum, c1Error = generateSpectra(sc, regpix, 1)
+    c1NumOfLines, c1Freqs, c1Heights = countLines(freq, c1Spectrum, c1Error)
+    c1LineProperties = linesTable(name, c1Freqs, c1Heights)
+    c1Lines.update(c1LineProperties)
+
     for i in range(numberOfRegions):
-        csvHeader += f', Region {i}'
         subcube = sc.subcube_from_regions([regpix[i]])
         spectrum = subcube.mean(axis=(1, 2))
         spectraError = getError(freq, spectrum)
-        numOfLines = countLines(freq, spectrum, spectraError)
+        numOfLines, linefreqs, linepeaks = countLines(freq, spectrum,
+                                                      spectraError)
         freqRange = freq[-1].value-freq[0].value
         lineFrequency = numOfLines/freqRange
-        entry += f', {lineFrequency} lines/GHz'
-    entry += '\n'
-    allEntries.append(entry)
-    # good to save as both png and pdf
-with open("/home/pw/research/Cloud-C/results/tables/line-richness.csv", "w") as table:
-    table.write(csvHeader+'\n')
-    for entry in allEntries:
-        table.write(entry)
-
-# make table of peak value and central freq for each line in brightest source
-    # prob want to plot for visual check
-# scale table per source (comparing continuum brightness)
-# search for line in other cubes (account for velocity)
-    # make tables of peaks in other cubes
-        # prob want to plot for visual check
-    # search +- some velocity for line
-        # see if noise > expected (flag)
-        # make note of velocity offset
-        # add to count
-
-# To-do
-    # brightest table
-        # line 'name' (prolly just "line 1, line 2...")
-        # central freq
-        # peak intensity
-        # calculate velocity WITH uncertainty
-        # plot w/ v lines and points at peaks
-    # expected tables
-        # line 'name' (prolly just "line 1, line 2...")
-        # central freq
-        # expected intensity
-    # detection tables
-        # line name
-        # detection?
-        # is expected < noise flag
-        # central freq/velocity offset
-        # v lines only if velocity offset > uncertainty
-        # plot w/ expected v lines, offset v lines, expected peak, real peak
-    # richness table
-        # line/GHz for each region in each cube
