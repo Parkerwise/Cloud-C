@@ -66,6 +66,18 @@ imageGalactic, c_footprint = reproject.reproject_interp((image_2D, w1),
 sigma = 0.36  # mJy/beam, std of noise
 cloudDendrogram = Dendrogram.compute(imageGalactic, min_value=sigma,
                                      min_delta=1*sigma, wcs=wcs_out)
+# manually removes unwanted trunk and leaves
+unwantedIDS = [24, 14, 7, 23, 21, 19, 17]
+unwantedStructs = [24, 0, 1, 2, 5, 22, 21]
+unwantedLeaves = [13, 8, 6, 0, 12, 10, 11]
+'''
+cloudDendrogram.trunk.remove(cloudDendrogram.trunk[0])
+cloudDendrogram.trunk.remove(cloudDendrogram.trunk[1])
+cloudDendrogram.trunk[0].descendants.remove(cloudDendrogram.leaves[12])
+cloudDendrogram.trunk[0].descendants.remove(cloudDendrogram.leaves[10])
+cloudDendrogram.trunk[0].descendants.remove(cloudDendrogram.leaves[0])
+print(cloudDendrogram.trunk[0].descendants)
+'''
 # Creates catalog of dendrogram structures
 catalogMetadata = {}
 catalogMetadata['data_unit'] = u.mJy / u.beam
@@ -73,6 +85,10 @@ catalogMetadata['spatial_scale'] = 0.28 * u.arcsec
 catalogMetadata['beam_major'] = 2.259 * u.arcsec  # FWHM
 catalogMetadata['beam_minor'] = 1.590 * u.arcsec  # FWHM
 cloudCatalog = pp_catalog(cloudDendrogram, catalogMetadata)
+cloudCatalogAdjusted = cloudCatalog
+for struct in unwantedIDS:
+    catalogMask = (cloudCatalogAdjusted['_idx'] != struct)
+    cloudCatalogAdjusted = cloudCatalogAdjusted[catalogMask]
 cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
                    format='ascii.csv', overwrite=True)
 cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
@@ -107,10 +123,11 @@ this was done previously in commit 564d8e2
 '''
 colors = ["red", "orange", "yellow", "green",
           "cyan", "blue", "purple", "magenta", "black"]
-for structure in cloudDendrogram:
-    currentLevel = structure.level
-    cloudPlots.plot_contour(contourAx, structure=structure,
-                            color=colors[currentLevel])
+for i, structure in enumerate(cloudDendrogram):
+    if i not in unwantedStructs:
+        currentLevel = structure.level
+        cloudPlots.plot_contour(contourAx, structure=structure,
+                                color=colors[currentLevel])
 lon = contourAx.coords[0]
 lon.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
 lat = contourAx.coords[1]
@@ -212,24 +229,27 @@ file for each frame
 '''
 fk5Regions = ''
 galRegions = ''
-for leaf in cloudDendrogram.leaves:
-    stats = PPStatistic(leaf)
-    galacticCoord = wcs_out.pixel_to_world(stats.x_cen, stats.y_cen)
-    fk5Coord = galacticCoord.fk5
-    # 60.2 degree angular offset between frames (angle of Milky way on sky)
-    fk5Region_sky = EllipseSkyRegion(center=fk5Coord,
-                                     height=2.3548*stats.minor_sigma.value*pixscale,
-                                     width=2.3548*stats.major_sigma.value*pixscale,
-                                     angle=stats.position_angle.value*u.deg-60.2*u.deg)
-    galacticRegion_sky = EllipseSkyRegion(center=galacticCoord,
-                                          height=2.3548*stats.minor_sigma.value*pixscale,
-                                          width=2.3548*stats.major_sigma.value*pixscale,
-                                          angle=stats.position_angle.value*u.deg)
-    fk5Regions += f'{fk5Region_sky.serialize(format="ds9")}\n'
-    galRegions += f'{galacticRegion_sky.serialize(format="ds9")}\n'
-    # different from regions files, plots ellipse onto figure
-    ellipse = stats.to_mpl_ellipse(edgecolor='red', facecolor='none')
-    apertureAx.add_patch(ellipse)
+for i, leaf in enumerate(cloudDendrogram.leaves):
+    # 5, 7, 9, 11
+    if i not in unwantedLeaves:
+        print(i)
+        stats = PPStatistic(leaf)
+        galacticCoord = wcs_out.pixel_to_world(stats.x_cen, stats.y_cen)
+        fk5Coord = galacticCoord.fk5
+        # 60.2 degree angular offset between frames (angle of Milky way on sky)
+        fk5Region_sky = EllipseSkyRegion(center=fk5Coord,
+                                         height=2.3548*stats.minor_sigma.value*pixscale,
+                                         width=2.3548*stats.major_sigma.value*pixscale,
+                                         angle=stats.position_angle.value*u.deg-60.2*u.deg)
+        galacticRegion_sky = EllipseSkyRegion(center=galacticCoord,
+                                              height=2.3548*stats.minor_sigma.value*pixscale,
+                                              width=2.3548*stats.major_sigma.value*pixscale,
+                                              angle=stats.position_angle.value*u.deg)
+        fk5Regions += f'{fk5Region_sky.serialize(format="ds9")}\n'
+        galRegions += f'{galacticRegion_sky.serialize(format="ds9")}\n'
+        # different from regions files, plots ellipse onto figure
+        ellipse = stats.to_mpl_ellipse(edgecolor='red', facecolor='none')
+        apertureAx.add_patch(ellipse)
 
 with open("/home/pw/research/Cloud-C/fk5Regions.reg", "w") as table:
     table.write(fk5Regions)

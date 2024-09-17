@@ -1,9 +1,5 @@
 # Region file format: DS9 astropy/regions
 galactic
-ellipse(0.37403928,0.03911320,0.00018624,0.00017928,146.86499507)
-
-# Region file format: DS9 astropy/regions
-galactic
 ellipse(0.37565757,0.03997324,0.00040680,0.00037068,130.24549546)
 
 # Region file format: DS9 astropy/regions
@@ -24,33 +20,9 @@ ellipse(0.37705684,0.04116445,0.00022172,0.00015346,98.33872612)
 
 # Region file format: DS9 astropy/regions
 galactic
-ellipse(0.38392203,0.04156897,0.00030404,0.00021608,65.75199122)
-
-# Region file format: DS9 astropy/regions
-galactic
 ellipse(0.37558148,0.04147885,0.00024893,0.00018576,69.55048990)
 
 # Region file format: DS9 astropy/regions
 galactic
-ellipse(0.38309504,0.04161777,0.00033659,0.00017130,124.23724139)
-
-# Region file format: DS9 astropy/regions
-galactic
 ellipse(0.37688965,0.04203507,0.00019150,0.00013682,59.88279801)
-
-# Region file format: DS9 astropy/regions
-galactic
-ellipse(0.37448761,0.04251953,0.00034056,0.00013380,56.39041167)
-
-# Region file format: DS9 astropy/regions
-galactic
-ellipse(0.38091754,0.04308257,0.00037320,0.00019355,65.82621364)
-
-# Region file format: DS9 astropy/regions
-galactic
-ellipse(0.37784977,0.04286879,0.00017249,0.00013076,122.77411127)
-
-# Region file format: DS9 astropy/regions
-galactic
-ellipse(0.38302630,0.04308881,0.00017588,0.00010472,60.17744987)
 

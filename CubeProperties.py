@@ -17,7 +17,6 @@ fitsFilenames = ["A.Dust_Ridge_12C18O.cube.I.pbcor.fits",
                  "A.Dust_Ridge_sci.spw31.cube.I.pbcor.fits",
                  "B.Dust_Ridge_12C16O_1-0.cube.I.pbcor.fits",
                  "B.Dust_Ridge_12C17O.cube.I.pbcor.fits",
-                 "B.Dust_Ridge_sci.spw25_27_29_31.cont.I.tt0.pbcor.fits",
                  "B.Dust_Ridge_sci.spw29.cube.I.pbcor.fits",
                  "B.Dust_Ridge_sci.spw31.cube.I.pbcor.fits"]
 # allows us to find header key given header value
@@ -68,24 +67,22 @@ def fetchSpatialAxes(header):
 
 
 def cube_properties(path):
-    calibration = path[0]
+    dataSet = path[0]
     path = folderPath+path
     image = fits.getdata(path)
     header = fits.getheader(path)
-    spectralWindow = header['FILNAM04']
-    name = calibration+'.'+spectralWindow
-    xdim = header['CTYPE1']+": "+header['CUNIT1']
-    ydim = header['CTYPE2']+": "+header['CUNIT2']
-    zdim = header['CTYPE3']+": "+header['CUNIT3']
+    spectralWindow = header['FILNAM04'][3:]
+    xdim = header['NAXIS1']
+    ydim = header['NAXIS2']
     spatialAxes = fetchSpatialAxes(header)
     if spatialAxes is False:
         pixelScale = "---"
     else:
         # pixel scale is multiplied from degrees to asec
-        pixelScale = f"{Decimal(abs(header['CDELT1'])*3600):.3E} asec/px"
-    bmaj = f"{Decimal(header['BMAJ']*3600):.3E} asec"
-    bmin = f"{Decimal(header['BMIN']*3600):.3E} asec"
-    bpa = f"{Decimal(header['BPA']):.3E} deg"
+        pixelScale = f"{Decimal(abs(header['CDELT1'])*3600):.2f}"
+    bmaj = f"{Decimal(header['BMAJ']*3600):.2f}"
+    bmin = f"{Decimal(header['BMIN']*3600):.2f}"
+    bpa = f"{Decimal(header['BPA']):.2f}"
     freqAxis = fetchFreqAxis(header)
     if freqAxis is False:
         freqRange = "---"
@@ -102,13 +99,15 @@ def cube_properties(path):
         endFreq = startFreqVal+channelWidth*channels
         freqWidth = (endFreq-startFreqVal)
         # Decimal formats values in scientific notation
-        freqWidth = f"{Decimal(freqWidth):.3E} {freqUnit}"
-        startFreq = f"{Decimal(float(startFreqVal)):.3E}"
-        endFreq = f"{Decimal(float(endFreq)):.3E}"
-        freqRange = f"[{startFreq} - {endFreq}] G{freqUnit}"
-        channelWidth = f"{Decimal(channelWidth):.3E} G{freqUnit}"
-    return startFreqVal, f"{name},{xdim}, {ydim},{zdim}, {pixelScale}, {bmaj}, {bmin}, {bpa}, {channels},{channelWidth},{freqWidth}, {freqRange}\n"
-
+        freqWidth = f"{Decimal(freqWidth):.2f}"
+        startFreq = f"{Decimal(float(startFreqVal)):.2f}"
+        endFreq = f"{Decimal(float(endFreq)):.2f}"
+        freqRange = f"{startFreq} - {endFreq}"
+        channelWidth = channelWidth * 10 ** 3
+        channelWidth = f"{Decimal(channelWidth):.2f}"
+    return startFreqVal, [f"{dataSet} & {spectralWindow} & {xdim} & {ydim}\\\\",
+                          f"{dataSet} & {spectralWindow} & {pixelScale} & {bmaj} & {bmin} & {bpa} \\\\",
+                          f"{dataSet} & {spectralWindow} & {channels} & {channelWidth} & {freqWidth} &  {freqRange}\\\\ \n"]
 
 '''
 csv should be sorted by ascending frequency
@@ -120,7 +119,36 @@ for path in fitsFilenames:
     freq, entry = cube_properties(path)
     entryAndFreq[freq] = entry
 sortedEntries = sorted(entryAndFreq.items())
-with open("/home/pw/research/Cloud-C/results/tables/cube-properties.csv", 'w') as table:
-    table.write("name, xdim, ydim, zdim, pixelScale, bmaj, bmin, bpa, channels,channelWidth,freqWidth, freqRange\n")
-    for entry in sortedEntries:
-        table.write(entry[1])
+
+
+def colString(numCols):
+    colsString = "{|"
+    for i in range(numCols):
+        colsString += "c|"
+    colsString += "}"
+    return colsString
+
+
+# Table 1
+print(f"\\begin{{center}}\n\\begin{{tabular}}{colString(4)}")
+print("Data Set& Spectral Window& X & Y \\\\ \n")
+print("\\hline")
+for entry in sortedEntries:
+    print(entry[1][0])
+print("\\end{tabular}\n\\end{center}")
+
+# Table 2
+print(f"\\begin{{center}}\n\\begin{{tabular}}{colString(6)}")
+print("Data Set& Spectral Window &Pixel Scale(\"/px) & bmaj (\") & bmin (\") & bpa ($^{\\circ}$)\\\\ \n")
+print("\\hline")
+for entry in sortedEntries:
+    print(entry[1][1])
+print("\\end{tabular}\n\\end{center}")
+
+# Table 3
+print(f"\\begin{{center}}\n\\begin{{tabular}}{colString(6)}")
+print("Data Set & spw & Channels & Channel Width (MHz) & Freq. Width (GHz) & Freq. Range (GHz) \\\\ \n")
+print("\\hline")
+for entry in sortedEntries:
+    print(entry[1][2])
+print("\\end{tabular}\n\\end{center}")
