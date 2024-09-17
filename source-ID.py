@@ -12,9 +12,6 @@ from astrodendro.analysis import PPStatistic
 from astrodendro import Dendrogram, pp_catalog
 import astropy.io.fits as fits  # 6.1.0
 from regions import EllipseSkyRegion
-from regions import EllipsePixelRegion
-from astropy.coordinates import ICRS
-from regions import PixCoord
 # astrodendro viewer not compatible with matplotlib >= 3.7
 import matplotlib.pyplot as plt  # 3.6.0
 from astropy.wcs import WCS
@@ -89,9 +86,9 @@ cloudCatalogAdjusted = cloudCatalog
 for struct in unwantedIDS:
     catalogMask = (cloudCatalogAdjusted['_idx'] != struct)
     cloudCatalogAdjusted = cloudCatalogAdjusted[catalogMask]
-cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
+cloudCatalogAdjusted.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
                    format='ascii.csv', overwrite=True)
-cloudCatalog.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
+cloudCatalogAdjusted.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
                    format='ascii.ecsv', overwrite=True, delimiter=',')
 '''
 catalog can be saved many different ways. See ASCII tables in astropy docs
@@ -230,9 +227,7 @@ file for each frame
 fk5Regions = ''
 galRegions = ''
 for i, leaf in enumerate(cloudDendrogram.leaves):
-    # 5, 7, 9, 11
     if i not in unwantedLeaves:
-        print(i)
         stats = PPStatistic(leaf)
         galacticCoord = wcs_out.pixel_to_world(stats.x_cen, stats.y_cen)
         fk5Coord = galacticCoord.fk5
