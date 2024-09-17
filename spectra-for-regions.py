@@ -83,6 +83,8 @@ for cube, name in zip(cubeList, cubeAbbreviation):
         ax1 = plt.subplot(numberOfRegions, 1, i+1)
         ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
         ax1.set_title(f"region {i}")
+        ax1.set_xlim(freq[0].value, freq[-1].value)
+        ax1.set_ylim(-0.5, 0.5)
         spectraError = getError(freq, spectrum)
         plt.hlines(spectraError, freq[0].value, freq[-1].value,
                    colors="red", ls="--")
