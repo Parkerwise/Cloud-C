@@ -77,12 +77,13 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     numberOfRegions = len(regpix)
 
     fig1 = plt.figure(1, figsize=(15, 2*numberOfRegions), dpi=250)
+    names = [8, 10, 12, 13, 16, 18, 20]
     for i in range(numberOfRegions):
         subcube = sc.subcube_from_regions([regpix[i]])
         spectrum = subcube.mean(axis=(1, 2))
         ax1 = plt.subplot(numberOfRegions, 1, i+1)
         ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
-        ax1.set_title(f"region {i}")
+        ax1.set_title(f"region {names[i]}")
         ax1.set_xlim(freq[0].value, freq[-1].value)
         ax1.set_ylim(-0.5, 0.5)
         spectraError = getError(freq, spectrum)

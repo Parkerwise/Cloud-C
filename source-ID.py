@@ -64,7 +64,7 @@ sigma = 0.36  # mJy/beam, std of noise
 cloudDendrogram = Dendrogram.compute(imageGalactic, min_value=sigma,
                                      min_delta=1*sigma, wcs=wcs_out)
 # manually removes unwanted trunk and leaves
-unwantedIDS = [24, 14, 7, 23, 21, 19, 17]
+unwantedIDS = [22, 24, 14, 7, 23, 21, 19, 17]
 unwantedStructs = [24, 0, 1, 2, 5, 22, 21]
 unwantedLeaves = [13, 8, 6, 0, 12, 10, 11]
 '''
@@ -81,11 +81,18 @@ catalogMetadata['data_unit'] = u.mJy / u.beam
 catalogMetadata['spatial_scale'] = 0.28 * u.arcsec
 catalogMetadata['beam_major'] = 2.259 * u.arcsec  # FWHM
 catalogMetadata['beam_minor'] = 1.590 * u.arcsec  # FWHM
-cloudCatalog = pp_catalog(cloudDendrogram, catalogMetadata)
+cloudCatalog = pp_catalog(cloudDendrogram.leaves, catalogMetadata)
 cloudCatalogAdjusted = cloudCatalog
 for struct in unwantedIDS:
     catalogMask = (cloudCatalogAdjusted['_idx'] != struct)
     cloudCatalogAdjusted = cloudCatalogAdjusted[catalogMask]
+cloudCatalogAdjusted['peak_brightness'] = 0. * u.mJy / u.beam
+j = 0
+for i, leaf in enumerate(cloudDendrogram.leaves):
+    if i not in unwantedLeaves:
+        cloudCatalogAdjusted['peak_brightness'][j] = leaf.get_peak()[1]
+        j += 1
+print(cloudCatalogAdjusted)
 cloudCatalogAdjusted.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv',
                    format='ascii.csv', overwrite=True)
 cloudCatalogAdjusted.write('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.ecsv',
@@ -224,6 +231,8 @@ that we can append to (remembering to add and endline at the end
 I had issues wrt position angle between fk5 and galactic, so I made one regions
 file for each frame
 '''
+regionNames = list(cloudCatalogAdjusted['_idx'])
+k = 0
 fk5Regions = ''
 galRegions = ''
 for i, leaf in enumerate(cloudDendrogram.leaves):
@@ -240,8 +249,11 @@ for i, leaf in enumerate(cloudDendrogram.leaves):
                                               height=2.3548*stats.minor_sigma.value*pixscale,
                                               width=2.3548*stats.major_sigma.value*pixscale,
                                               angle=stats.position_angle.value*u.deg)
-        fk5Regions += f'{fk5Region_sky.serialize(format="ds9")}\n'
-        galRegions += f'{galacticRegion_sky.serialize(format="ds9")}\n'
+        newFk5Reg = f'{fk5Region_sky.serialize(format="ds9")}'
+        fk5Regions += newFk5Reg[:-2] + f'# text={{Region {regionNames[k]}}} \n'
+        newGalReg = f'{galacticRegion_sky.serialize(format="ds9")}'
+        galRegions += newGalReg[:-2] + f'# text={{Region {regionNames[k]}}} \n'
+        k += 1
         # different from regions files, plots ellipse onto figure
         ellipse = stats.to_mpl_ellipse(edgecolor='red', facecolor='none')
         apertureAx.add_patch(ellipse)

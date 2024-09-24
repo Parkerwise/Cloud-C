@@ -6,6 +6,7 @@ Description: quantifies richness towards each source
 Python Version: 3.11.9
 '''
 from astropy import units as u
+import pprint
 import scipy
 import numpy as np
 from scipy import stats as st
@@ -77,7 +78,7 @@ def generateSpectra(cube, regionsList, regionIndex):
 def linesTable(name, linefreqs, lineheights):
     dict = {
         f'{name} lines': {
-            f'line {i}': {
+            f'line {i:02}': {
                 'central freq': freq,
                 'line height': height
             } for i, (freq, height) in enumerate(zip(linefreqs, lineheights))
@@ -86,7 +87,14 @@ def linesTable(name, linefreqs, lineheights):
     return dict
 
 
+# Regions from which spectra is extracted
+regions_file = "/home/pw/research/Cloud-C/fk5Regions.reg"
+regpix = Regions.read(regions_file)
+numberOfRegions = len(regpix)
+
 c1Lines = {}
+totalLines = {f"region {i:02}": 0 for i in range(numberOfRegions)}
+# region, num of lines
 # Loop is run on each cube we're interested in
 for cube, name in zip(cubeList, cubeAbbreviation):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
@@ -101,18 +109,13 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     # # defines our frequency as a list
     freq, Dec, Ra = sc.world[:, 0, 0]
 
-    # Regions from which spectra is extracted
-    regions_file = "/home/pw/research/Cloud-C/fk5Regions.reg"
-    regpix = Regions.read(regions_file)
-    numberOfRegions = len(regpix)
-
     # Calculate lines towards core C1
-    c1Spectrum, c1Error = generateSpectra(sc, regpix, 1)
+    c1Spectrum, c1Error = generateSpectra(sc, regpix, 0)
     c1NumOfLines, c1Freqs, c1Heights = countLines(freq, c1Spectrum, c1Error)
     c1LineProperties = linesTable(name, c1Freqs, c1Heights)
     c1Lines.update(c1LineProperties)
-
-    for i in range(numberOfRegions):
+    totalLines["region 00"] += c1NumOfLines
+    for i in range(1, numberOfRegions):
         subcube = sc.subcube_from_regions([regpix[i]])
         spectrum = subcube.mean(axis=(1, 2))
         spectraError = getError(freq, spectrum)
@@ -120,3 +123,7 @@ for cube, name in zip(cubeList, cubeAbbreviation):
                                                       spectraError)
         freqRange = freq[-1].value-freq[0].value
         lineFrequency = numOfLines/freqRange
+        totalLines[f"region {i:02}"] += numOfLines
+pprint.pprint(c1Lines)
+print(f'total number of lines in c1: {totalLines["region 00"]}')
+pprint.pprint(totalLines)
