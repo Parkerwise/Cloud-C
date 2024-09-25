@@ -6,6 +6,7 @@ Description: quantifies richness towards each source
 Python Version: 3.11.9
 '''
 from astropy import units as u
+import pandas as pd
 import pprint
 import scipy
 import numpy as np
@@ -75,6 +76,7 @@ def generateSpectra(cube, regionsList, regionIndex):
     return spectrum, spectraError
 
 
+# I decided to do dicts of dicts to keep track of multiple values
 def linesTable(name, linefreqs, lineheights):
     dict = {
         f'{name} lines': {
@@ -87,6 +89,17 @@ def linesTable(name, linefreqs, lineheights):
     return dict
 
 
+'''
+Part of our goal is to see how many lines identified in core c1 fall below
+the noise of the spectra in other cubes. In order to do this we scale the lines
+from c1 by the peak brightness of each source. These values are stored in
+our catalog we generated in source-ID.py
+'''
+df = pd.read_csv('/home/pw/research/Cloud-C/results/tables/CloudC-catalog.csv')
+peak_brightness = df.peak_brightness
+brightness_ratios = [peak/peak_brightness[0] for peak in peak_brightness]
+
+
 # Regions from which spectra is extracted
 regions_file = "/home/pw/research/Cloud-C/fk5Regions.reg"
 regpix = Regions.read(regions_file)
@@ -96,7 +109,7 @@ c1Lines = {}
 totalLines = {f"region {i:02}": 0 for i in range(numberOfRegions)}
 # region, num of lines
 # Loop is run on each cube we're interested in
-for cube, name in zip(cubeList, cubeAbbreviation):
+for i, (cube, name) in enumerate(zip(cubeList, cubeAbbreviation)):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
     # # creates spectral cube object
     sc = SpectralCube.read(path)
@@ -115,15 +128,29 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     c1LineProperties = linesTable(name, c1Freqs, c1Heights)
     c1Lines.update(c1LineProperties)
     totalLines["region 00"] += c1NumOfLines
-    for i in range(1, numberOfRegions):
-        subcube = sc.subcube_from_regions([regpix[i]])
+
+    # C1 Heights in cube blank
+    # scaled heights
+    # scaled heights
+    scaledHeights = c1Heights * brightness_ratios[i]
+    for j in range(1, numberOfRegions):
+        subcube = sc.subcube_from_regions([regpix[j]])
         spectrum = subcube.mean(axis=(1, 2))
         spectraError = getError(freq, spectrum)
         numOfLines, linefreqs, linepeaks = countLines(freq, spectrum,
                                                       spectraError)
         freqRange = freq[-1].value-freq[0].value
         lineFrequency = numOfLines/freqRange
-        totalLines[f"region {i:02}"] += numOfLines
-pprint.pprint(c1Lines)
-print(f'total number of lines in c1: {totalLines["region 00"]}')
+        totalLines[f"region {j:02}"] += numOfLines
+        above = 0
+        for height in scaledHeights:
+            if height > spectraError:
+                above += 1
+        print(name, f"region {j}:", f"above noise {above},",
+              f'total lines {c1NumOfLines}')
 pprint.pprint(totalLines)
+# scale lines, compare to noise
+    # c1 Heights, 
+# pprint.pprint(c1Lines)
+# print(f'total number of lines in c1: {totalLines["region 00"]}')
+# pprint.pprint(totalLines)
