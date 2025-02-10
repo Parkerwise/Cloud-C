@@ -11,7 +11,6 @@ from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.wcs import WCS
 import numpy as np
-from scipy import stats as st
 import regions
 import matplotlib.pyplot as plt
 from spectral_cube import SpectralCube
@@ -38,36 +37,20 @@ cubeAbbreviation = [
 
 
 # Define a function to obtain the error from a given spectrum
-def getError(freq, spectrum):
-    binsize = 2
-    bin_num = len(spectrum) / binsize
-    binned_spectrum = st.binned_statistic(freq, spectrum, statistic='mean',
-                                          bins=bin_num)
-    sigma_bin = np.std(binned_spectrum.statistic)
-    prelim_error = 4 * sigma_bin  # Four sigma of binned spectrum
-    spectrum_ref = spectrum.copy()
-    for channel in range(len(spectrum)):
-        if spectrum_ref[channel].value > prelim_error or spectrum_ref[channel].value < -prelim_error:
-            spectrum_ref[channel] = 0
-    sigma_ref = np.std(spectrum_ref[0:-1].value)
-    acceptable_error = 4 * sigma_ref  # Re-calculate error after first trimming
-    spectrum_ref2 = spectrum_ref.copy()  # Copy spectrum and trim out values over error
-    for channel in range(len(spectrum)):
-        if spectrum_ref2[channel].value > acceptable_error or spectrum_ref2[channel].value < -acceptable_error:
-            spectrum_ref2[channel] = 0
-    sigma_ref2 = np.std(spectrum_ref2[0:-1].value)
-    acceptable_error2 = sigma_ref2  # Re-calculate error after second trimming
-    return acceptable_error2
-
 
 # Loop is run on each cube we're interested in
+noiseLimits = [
+              [1050, 1900],  # A29
+              [800, 1150],  # A31
+              [100, 600],  # B29
+              [1300, 1900]]  # B31
 fig1 = plt.figure(1, figsize=(30, 10))
 for i, (cube, name) in enumerate(zip(cubeList, cubeAbbreviation)):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
     header = fits.getheader(path)
     w1 = WCS(header)
     w1 = w1.dropaxis(3)
-    w1 = w1.dropaxis(2)
+    w1= w1.dropaxis(2)
     # # creates spectral cube object
     sc = SpectralCube.read(path)
     sc.allow_huge_operations = True
@@ -100,13 +83,17 @@ for i, (cube, name) in enumerate(zip(cubeList, cubeAbbreviation)):
     ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
     ax1.set_xlim(freq[0].value, freq[-1].value)
     ax1.set_ylim(-0.5, 0.5)
-    spectraError = getError(freq, spectrum)
-    print(name, spectraError)
-    plt.hlines(spectraError, freq[0].value, freq[-1].value,
+    noiseUpper = noiseLimits[i][1]
+    noiseLower = noiseLimits[i][0]
+    plt.vlines(freq[noiseUpper].value, -1, 2, colors="black")
+    plt.vlines(freq[noiseLower].value, -1, 2, colors="black")
+    sigma = np.std(spectrum[noiseLower:noiseUpper].value)
+    print(name, sigma)
+    plt.hlines(sigma, freq[0].value, freq[-1].value,
                colors="red", ls="--")
-    plt.hlines(-spectraError, freq[0].value, freq[-1].value,
+    plt.hlines(-sigma, freq[0].value, freq[-1].value,
                colors="red", ls="--")
-    plt.fill_between(freq.value, spectraError, -spectraError, alpha=0.2,
+    plt.fill_between(freq.value, sigma, -sigma, alpha=0.2,
                      color='red', label='Error')
     fig1.supxlabel("Frequency (GHz)", fontsize=10)
     fig1.supylabel('Brightness Temp. (K)', fontsize=10)

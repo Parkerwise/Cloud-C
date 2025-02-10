@@ -7,6 +7,7 @@ Python Version: 3.11.9
 '''
 
 import astropy.io.fits as fits  # 6.1.0
+import matplotlib.pyplot as plt
 from astropy.wcs import WCS
 import numpy as np  # 1.26.4
 import pandas as pd  # 2.2.2
@@ -56,7 +57,6 @@ for center, radius in zip(centers, df.radius):
 addMask(image_2D, 100, (166, 175), remove_inside=False)  # crops noisy edges
 sigma = np.nanstd(image_2D)
 # for viewing mask
-import matplotlib.pyplot as plt
 im1 = plt.imshow(image_2D, cmap='Greys_r', vmax=5)  # plots continuum
 plt.show()
 print(f"sigma: {sigma}, 5 sigma: {5*sigma}")

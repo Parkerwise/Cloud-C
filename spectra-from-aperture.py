@@ -17,7 +17,7 @@ if not sys.warnoptions:
 
 # Reading in files
 # # This should be the file where we're extracting spectra
-path = "/home/pw/research/Cloud-C/co-data/B.Dust_Ridge_12C16O_1-0.cube.I.pbcor.fits"
+path = "/home/pw/research/Cloud-C/co-data/A.Dust_Ridge_sci.spw29.cube.I.pbcor.fits"
 # # creates spectral cube object
 sc = SpectralCube.read(path)
 sc.allow_huge_operations = True
@@ -75,6 +75,7 @@ plt.fill_between(freq.value, three_sigma, -three_sigma, alpha=0.2,
 fig1.supxlabel("Frequency (GHz)", fontsize=10)
 fig1.supylabel('Brightness Temp. (K)', fontsize=10)
 plt.legend(fontsize=14, loc="upper left")
+print(freq[-1]-freq[0])
 plt.tight_layout()  # Adjust params to avoid overlap and decrease white space
 # good to save as both png and pdf
 '''

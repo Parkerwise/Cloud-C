@@ -106,9 +106,12 @@ regpix = Regions.read(regions_file)
 numberOfRegions = len(regpix)
 
 c1Lines = {}
-totalLines = {f"region {i:02}": 0 for i in range(numberOfRegions)}
+totalLines = {f"region {i}": 0 for i in range(numberOfRegions)}
+totalabove = {f"region {i}": 0 for i in range(numberOfRegions)}
 # region, num of lines
 # Loop is run on each cube we're interested in
+error = [0.042853665119683346, 0.11609788708836583, 0.034934569852619564,
+         0.03281507998761665]
 for i, (cube, name) in enumerate(zip(cubeList, cubeAbbreviation)):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
     # # creates spectral cube object
@@ -124,31 +127,39 @@ for i, (cube, name) in enumerate(zip(cubeList, cubeAbbreviation)):
 
     # Calculate lines towards core C1
     c1Spectrum, c1Error = generateSpectra(sc, regpix, 0)
-    c1NumOfLines, c1Freqs, c1Heights = countLines(freq, c1Spectrum, c1Error)
+    c1NumOfLines, c1Freqs, c1Heights = countLines(freq, c1Spectrum, 4*error[i])
     c1LineProperties = linesTable(name, c1Freqs, c1Heights)
     c1Lines.update(c1LineProperties)
-    totalLines["region 00"] += c1NumOfLines
+    totalLines["region 0"] += c1NumOfLines
 
     # C1 Heights in cube blank
     # scaled heights
     # scaled heights
-    scaledHeights = c1Heights * brightness_ratios[i]
+    print(brightness_ratios)
     for j in range(1, numberOfRegions):
+        scaledHeights = c1Heights * brightness_ratios[j]
         subcube = sc.subcube_from_regions([regpix[j]])
         spectrum = subcube.mean(axis=(1, 2))
-        spectraError = getError(freq, spectrum)
+        spectraError = error[i]*4
         numOfLines, linefreqs, linepeaks = countLines(freq, spectrum,
                                                       spectraError)
         freqRange = freq[-1].value-freq[0].value
         lineFrequency = numOfLines/freqRange
-        totalLines[f"region {j:02}"] += numOfLines
+        totalLines[f"region {j}"] += numOfLines
         above = 0
         for height in scaledHeights:
             if height > spectraError:
                 above += 1
+        totalabove[f"region {j}"] += above
         print(name, f"region {j}:", f"above noise {above},",
               f'total lines {c1NumOfLines}')
-pprint.pprint(totalLines)
+totalabove["region 0"] = ""
+print("\\begin{center}\n\\begin{tabular}{|c|c|c|}")
+print("\\hline\nRegion & Lines Identified& Above Noise\\\\\n\\hlines")
+regionNames = [8, 10, 12, 13, 16, 18, 20]
+for i, region in enumerate(totalLines):
+    print(f"{regionNames[i]} & {totalLines[region]} & {totalabove[region]} \\\\")
+print("\\end{tabular}\n\\end{center}")
 # scale lines, compare to noise
     # c1 Heights, 
 # pprint.pprint(c1Lines)

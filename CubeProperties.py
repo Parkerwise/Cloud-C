@@ -99,12 +99,14 @@ def cube_properties(path):
         endFreq = startFreqVal+channelWidth*channels
         freqWidth = (endFreq-startFreqVal)
         # Decimal formats values in scientific notation
-        freqWidth = f"{Decimal(freqWidth):.2f}"
+        freqWidth = f"{Decimal(freqWidth):.3f}"
         startFreq = f"{Decimal(float(startFreqVal)):.2f}"
         endFreq = f"{Decimal(float(endFreq)):.2f}"
         freqRange = f"{startFreq} - {endFreq}"
-        channelWidth = channelWidth * 10 ** 3
+        channelWidth0 = channelWidth
         channelWidth = f"{Decimal(channelWidth):.2f}"
+        rest = header["RESTFRQ"]*1e-9
+        print(f'{dataSet}{spectralWindow},{3*1e5*channelWidth0/rest:.4}')
     return startFreqVal, [f"{dataSet} & {spectralWindow} & {xdim} & {ydim}\\\\",
                           f"{dataSet} & {spectralWindow} & {pixelScale} & {bmaj} & {bmin} & {bpa} \\\\",
                           f"{dataSet} & {spectralWindow} & {channels} & {channelWidth} & {freqWidth} &  {freqRange}\\\\ \n"]

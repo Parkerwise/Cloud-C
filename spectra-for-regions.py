@@ -57,8 +57,10 @@ def getError(freq, spectrum):
     return acceptable_error2
 
 
+error = [0.042853665119683346, 0.11609788708836583, 0.034934569852619564,
+         0.03281507998761665]
 # Loop is run on each cube we're interested in
-for cube, name in zip(cubeList, cubeAbbreviation):
+for cube, name, error in zip(cubeList, cubeAbbreviation, error):
     path = f"/home/pw/research/Cloud-C/co-data/{cube}"
     # # creates spectral cube object
     sc = SpectralCube.read(path)
@@ -76,27 +78,34 @@ for cube, name in zip(cubeList, cubeAbbreviation):
     regpix = Regions.read(regions_file)
     numberOfRegions = len(regpix)
 
-    fig1 = plt.figure(1, figsize=(15, 2*numberOfRegions), dpi=250)
-    names = [8, 10, 12, 13, 16, 18, 20]
+    fig, axs = plt.subplots(numberOfRegions, 1, sharex=True,
+                            figsize=(6, numberOfRegions), dpi=250,
+                            layout='constrained')
+    names = [1, 7, 2, 4, 5, 3, 6]
     for i in range(numberOfRegions):
         subcube = sc.subcube_from_regions([regpix[i]])
         spectrum = subcube.mean(axis=(1, 2))
-        ax1 = plt.subplot(numberOfRegions, 1, i+1)
-        ax1.plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
-        ax1.set_title(f"region {names[i]}")
-        ax1.set_xlim(freq[0].value, freq[-1].value)
-        ax1.set_ylim(-0.5, 0.5)
-        spectraError = getError(freq, spectrum)
-        plt.hlines(spectraError, freq[0].value, freq[-1].value,
-                   colors="red", ls="--")
-        plt.hlines(-spectraError, freq[0].value, freq[-1].value,
-                   colors="red", ls="--")
-        plt.fill_between(freq.value, spectraError, -spectraError, alpha=0.2,
-                         color='red', label='Error')
-    fig1.supxlabel("Frequency (GHz)", fontsize=10)
-    fig1.supylabel('Brightness Temp. (K)', fontsize=10)
-    plt.tight_layout()  # Adjust params to avoid overlap and decrease white space
+        order = names[i]-1
+        print(order)
+        # axs[order].tick_params(axis='both', which='major', labelsize=10)
+        axs[order].plot(freq, spectrum, lw=1, drawstyle='steps-mid', color="SteelBlue")
+        axs[order].annotate(f"Region {names[i]}", (freq[0].value+.05, -0.4))
+        axs[order].set_xlim(freq[0].value, freq[-1].value)
+        axs[order].set_ylim(-0.5, 0.5)
+        spectraError = error*4
+        axs[order].hlines(spectraError, freq[0].value, freq[-1].value,
+                          colors="red", ls="--")
+        axs[order].hlines(-spectraError, freq[0].value, freq[-1].value,
+                          colors="red", ls="--")
+        axs[order].fill_between(freq.value, spectraError, -spectraError, alpha=0.2,
+                                color='red', label='Error')
+    fig.supxlabel("Frequency (GHz)", fontsize=10, va='top')
+    fig.subplots_adjust(wspace=0.1,
+                        hspace=0.3)
+    fig.supylabel('Brightness Temp. (K)', fontsize=10)
     # good to save as both png and pdf
     plt.savefig(f"/home/pw/research/Cloud-C/results/spectra/{name}/{name}-line-richness.png")
-    plt.savefig(f"/home/pw/research/Cloud-C/results/spectra/{name}/{name}-line-richness.pdf")
+    plt.savefig(f"/home/pw/research/Cloud-C/results/spectra/{name}/{name}-line-richness.pdf"
+                , bbox_inches="tight")
+    fig.subplots_adjust(wspace=0, hspace=0)
     plt.clf()  # Removes this cubes spectra so it won't be plotted on the next

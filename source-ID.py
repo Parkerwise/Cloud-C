@@ -18,6 +18,7 @@ from astropy.wcs import WCS
 from astropy import units as u
 import numpy as np  # 1.26.4
 import reproject  # 0.13.1
+import matplotlib
 from reproject.mosaicking import find_optimal_celestial_wcs
 import sys
 if not sys.warnoptions:
@@ -25,6 +26,8 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 # Importing image
+matplotlib.rcParams.update({'font.size': 10})
+plt.rcParams['xtick.major.pad'] = '8'
 path = "/home/pw/research/Cloud-C/co-data/CloudC_mJy.fits"
 image = fits.getdata(path)
 header = fits.getheader(path)
@@ -81,6 +84,7 @@ catalogMetadata['data_unit'] = u.mJy / u.beam
 catalogMetadata['spatial_scale'] = 0.28 * u.arcsec
 catalogMetadata['beam_major'] = 2.259 * u.arcsec  # FWHM
 catalogMetadata['beam_minor'] = 1.590 * u.arcsec  # FWHM
+catalogMetadata['wcs'] = wcs_out
 cloudCatalog = pp_catalog(cloudDendrogram.leaves, catalogMetadata)
 cloudCatalogAdjusted = cloudCatalog
 for struct in unwantedIDS:
@@ -164,23 +168,29 @@ def angularSeperation(beginningPixel, endingPixel):
     endingPixel = w1.pixel_to_world(x[1], y[1])
     return beginningPixel.separation(endingPixel)
 '''
-plt.text(155, 125, '1pc', fontsize=14, color='black')
 
 # formats plot
 lon.set_ticks(size=-3)
 lat.set_ticks(size=-3)
-plt.xlabel('Galactic Longtitude', fontsize=20, labelpad=1)
-plt.ylabel('Galactic Latitutude', fontsize=20, labelpad=1)
-contourAx.tick_params(axis='both', which='major', labelsize=15)
-plt.annotate('Continuum', fontsize=15, xy=(0.02, 0.91), xycoords="axes fraction")
+plt.xlabel('Galactic Longtitude', fontsize=10, labelpad=1)
+plt.ylabel('Galactic Latitutude', fontsize=10, labelpad=1)
+contourAx.tick_params(axis='both', which='major', labelsize=10)
+plt.annotate('Continuum', fontsize=10, xy=(0.02, 0.91), xycoords="axes fraction")
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-contours.pdf")
 plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-contours.png")
 
 
 # continuum and aperture plot
-apertureFigure = plt.figure(2, figsize=(14, 14), constrained_layout=True)
+image = fits.getdata(path)
+image_2D = np.squeeze(image)
+wcs_out, shape_out = find_optimal_celestial_wcs([(image_2D, w1)],
+                                                frame='galactic')
+imageGalactic, c_footprint = reproject.reproject_interp((image_2D, w1),
+                                                        wcs_out,
+                                                        shape_out=shape_out)
+apertureFigure = plt.figure(2, figsize=(5, 5), constrained_layout=True)
 apertureAx = apertureFigure.add_subplot(111, projection=wcs_out)
-apertureImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=10)
+apertureImage = plt.imshow(imageGalactic, cmap='Greys_r', vmax=5)
 
 lon = apertureAx.coords[0]
 lon.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
@@ -188,21 +198,27 @@ lat = apertureAx.coords[1]
 lat.set_format_unit(u.deg, decimal=True, show_decimal_unit=True)
 lon.display_minor_ticks(True)
 lat.display_minor_ticks(True)
-plt.xlim(115, 355)
-plt.ylim(115, 355)
+plt.xlim(80, 400)
+plt.ylim(80, 400)
 
 # plots beam
 my_beam = Beam.from_fits_header(header)
-ycen_pix, xcen_pix = 125, 340  # location of beam on plot
+ycen_pix, xcen_pix = 100, 375
 pixscale = 0.28 * u.arcsec
 ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
 plt.gca().add_patch(ellipse_artist)  # plots beam
 ellipse_artist.set_facecolor("white")
 ellipse_artist.set_edgecolor("black")
 
+# plots colorbar
+cb = plt.colorbar(fraction=0.046, pad=0.04)
+cb.set_label(label='Flux Density (mJy / beam)',
+             fontsize=10, rotation=270, labelpad=15)
+cb.ax.tick_params(which='major', labelsize=10)
+
 # plots scale bar
-x = [120, 210]
-y = [120, 120]
+x = [90, 180]
+y = [90, 90]
 plt.plot(np.array([x[0], x[1]]), np.array([y[0], y[1]]),
          color="black", linewidth=3)
 # scale is calculated using small angle approximation
@@ -213,14 +229,14 @@ def angularSeperation(beginningPixel, endingPixel):
     endingPixel = w1.pixel_to_world(x[1], y[1])
     return beginningPixel.separation(endingPixel)
 '''
-plt.text(155, 125, '1pc', fontsize=14, color='black')
+plt.text(125, 100, '1pc', fontsize=10, color='black')
 # formats plot
 lon.set_ticks(size=-3)
 lat.set_ticks(size=-3)
-plt.xlabel('Galactic Longtitude', fontsize=20, labelpad=1)
-plt.ylabel('Galactic Latitutude', fontsize=20, labelpad=1)
-apertureAx.tick_params(axis='both', which='major', labelsize=15)
-plt.annotate('Continuum', fontsize=15, xy=(0.02, 0.91), xycoords="axes fraction")
+plt.xlabel('Galactic Longtitude', fontsize=10, labelpad=1)
+plt.ylabel('Galactic Latitutude', fontsize=10, labelpad=1)
+apertureAx.tick_params(axis='both', which='major', labelsize=10, labelpad=1)
+plt.annotate('Continuum', fontsize=10, xy=(0.02, 0.91), xycoords="axes fraction")
 
 # aperture statistics
 '''
@@ -231,8 +247,9 @@ that we can append to (remembering to add and endline at the end
 I had issues wrt position angle between fk5 and galactic, so I made one regions
 file for each frame
 '''
-regionNames = list(cloudCatalogAdjusted['_idx'])
-k = 0
+regionNames = [1, 7, 2, 4, 5, 3, 6]
+print(regionNames)
+k = 00
 fk5Regions = ''
 galRegions = ''
 for i, leaf in enumerate(cloudDendrogram.leaves):
@@ -253,14 +270,38 @@ for i, leaf in enumerate(cloudDendrogram.leaves):
         fk5Regions += newFk5Reg[:-2] + f'# text={{Region {regionNames[k]}}} \n'
         newGalReg = f'{galacticRegion_sky.serialize(format="ds9")}'
         galRegions += newGalReg[:-2] + f'# text={{Region {regionNames[k]}}} \n'
-        k += 1
         # different from regions files, plots ellipse onto figure
         ellipse = stats.to_mpl_ellipse(edgecolor='red', facecolor='none')
         apertureAx.add_patch(ellipse)
-
+        if k == 2 or k == 3:
+            plt.annotate(f"{regionNames[k]}",
+                         (stats.x_cen.value, stats.y_cen.value+5))
+        if k == 1 or k == 4 or k == 6:
+            plt.annotate(f"{regionNames[k]}",
+                         (stats.x_cen.value-10, stats.y_cen.value))
+        if k == 0 or k == 5:
+            plt.annotate(f"{regionNames[k]}",
+                         (stats.x_cen.value+5, stats.y_cen.value))
+        k += 1
+for leaf in cloudCatalogAdjusted:
+    region = leaf["_idx"]
+    area = leaf["area_ellipse"]
+    major = leaf["major_sigma"]
+    minor = leaf["minor_sigma"]
+    positionAngle = leaf["position_angle"]
+    xCen = leaf["x_cen"]
+    yCen = leaf["y_cen"]
+    print(f"{region}&{area:.3f}&{major:.3f}&{minor:.3f}&{positionAngle:.3f}&{xCen:.3f}&{yCen:.3f}\\\\")
+for leaf in cloudCatalogAdjusted:
+    region = leaf["_idx"]
+    flux = 1e3*leaf["flux"]
+    peak = leaf["peak_brightness"]
+    print(f"{region}&{flux:.3f}&{peak:.3f}\\\\")
 with open("/home/pw/research/Cloud-C/fk5Regions.reg", "w") as table:
     table.write(fk5Regions)
 with open("/home/pw/research/Cloud-C/galRegions.reg", "w") as table:
     table.write(galRegions)
-plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.pdf")
-plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.png")
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.pdf"
+            , bbox_inches='tight')
+plt.savefig("/home/pw/research/Cloud-C/results/continuum/CloudC-structure-apertures.png"
+            , bbox_inches='tight')
