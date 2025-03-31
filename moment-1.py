@@ -6,6 +6,7 @@ Description:
 Python Version: 3.11.9
 '''
 from astropy.wcs import WCS
+import matplotlib.colors as colors
 from radio_beam import Beam
 from regions import Regions
 import reproject
@@ -25,6 +26,7 @@ if not sys.warnoptions:
 # # This should be the file where we're extracting spectra
 matplotlib.rcParams.update({'font.size': 10})
 data_dir = "/home/pw/research/Cloud-C/co-data/"
+
 cube_list = [
     "A.Dust_Ridge_12C18O.cube.I.pbcor.fits",
     "A.Dust_Ridge_13C16O.cube.I.pbcor.fits",
@@ -59,13 +61,20 @@ for path, name in zip(cube_list, cube_abbreviation):
     sc_K_kms = sc_bin.to(u.K)
 
     moment_0 = sc_K_kms.moment(order=0, how='slice')
-    badpix = np.where(moment_0.hdu.data < 100)
+    moment_1 = sc_K_kms.moment(order=1, how='slice')
+    moment_0_max = np.nanmax(moment_0.hdu.data)
+    moment_0_std = np.nanstd(moment_0.hdu.data)
+    threshold = 1.25 * moment_0_std
+    badpix = np.where(moment_0.hdu.data < threshold)
+    moment_1.hdu.data[badpix] = np.nan
     fig1 = plt.figure(1, figsize=(5, 5), constrained_layout=True)
 
-    wcs_out, shape_out = find_optimal_celestial_wcs([(moment_0.hdu.data, w1)],
+    wcs_out, shape_out = find_optimal_celestial_wcs([(moment_1.hdu.data, w1)],
                                                     frame='galactic')
     # Rotate image
-    cont, c_footprint = reproject.reproject_interp((moment_0.hdu.data, w1),
+    moment_0_cont, moment_0_c_footprint = reproject.reproject_interp((moment_0.hdu.data, w1),
+                                                                      wcs_out, shape_out=shape_out)
+    cont, c_footprint = reproject.reproject_interp((moment_1.hdu.data, w1),
                                                    wcs_out, shape_out=shape_out)
 
     ax1 = plt.subplot(1, 1, 1, projection=wcs_out)
@@ -76,7 +85,7 @@ for path, name in zip(cube_list, cube_abbreviation):
     lon.display_minor_ticks(True)
     lat.display_minor_ticks(True)
     padding = 20
-    bound = np.argwhere(~np.isnan(cont))
+    bound = np.argwhere(~np.isnan(moment_0_cont))
     x_min = min(bound[:, 1]-padding)
     y_min = min(bound[:, 0]-padding)
     x_max = max(bound[:, 1]+padding)
@@ -88,15 +97,29 @@ for path, name in zip(cube_list, cube_abbreviation):
     ycen_pix, xcen_pix = y_min+20, x_max-20
     pixscale = 0.28 * u.arcsec
     ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
-    im1 = plt.imshow(cont, cmap='Greys')
+    mean_velocity = np.nanmean(cont)
+    image_std = np.nanstd(cont)
+    # vmin = mean_velocity - 2 * image_std
+    # vmax = mean_velocity + 2 * image_std
+    vmin = -25
+    vmax = 100
+    print(vmin, vmax)
+    im1 = plt.imshow(cont, cmap='rainbow', vmin=vmin, vmax=vmax)
     plt.gca().add_patch(ellipse_artist)
     ellipse_artist.set_facecolor("white")
     ellipse_artist.set_edgecolor("black")
-    cb = plt.colorbar(im1, fraction=0.046, pad=0.04)
-    cb.set_label(label='Integrated Flux Density (K km/s)',
+
+    cmap = plt.cm.rainbow
+    norm = colors.Normalize(vmin=vmin, vmax=vmax)
+    scatter = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    scatter._A = np.array([norm.vmin, norm.vmax])
+    cb = plt.colorbar(scatter, fraction=0.046, pad=0.04, ax=plt.gca())
+    cb.set_label(label='Mean Weighted Velocity (km/s)',
                  fontsize=10, rotation=270, labelpad=10)
     cb.ax.tick_params(which='major', labelsize=10, pad=10)
-    plt.annotate(f'Moment 0\n{name}', fontsize=10, xy=(0.02, 0.91),
+
+
+    plt.annotate(f'Moment 1\n{name}', fontsize=10, xy=(0.02, 0.91),
                  xycoords="axes fraction")
     x = [x_min+10, x_min+100]
     y = [y_min+10, y_min+10]
@@ -116,7 +139,7 @@ for path, name in zip(cube_list, cube_abbreviation):
     k = 0
     for sky_region in regs:
         pixel_region = sky_region.to_pixel(wcs_out)
-        pixel_region.plot(color="red")
+        pixel_region.plot(color="black")
         x = pixel_region.center.xy[0]
         y = pixel_region.center.xy[1]
         if k == 2 or k == 3:
@@ -130,5 +153,5 @@ for path, name in zip(cube_list, cube_abbreviation):
                          (x+5, y))
         k += 1
 
-    plt.savefig(f"results/moment-maps/{name}-moment_0.pdf")
-    plt.savefig(f"results/moment-maps/{name}-moment_0.png", dpi=200)
+    plt.savefig(f"results/moment-maps/{name}-moment_1.pdf")
+    plt.savefig(f"results/moment-maps/{name}-moment_1.png", dpi=200)

@@ -58,14 +58,15 @@ for path, name in zip(cube_list, cube_abbreviation):
     sc_bin = sc_slab.downsample_axis(3, axis=0)
     sc_K_kms = sc_bin.to(u.K)
 
+    max_map = sc_K_kms.apply_numpy_function(np.nanmax, axis=0)
     moment_0 = sc_K_kms.moment(order=0, how='slice')
-    badpix = np.where(moment_0.hdu.data < 100)
+    # badpix = np.where(moment_0.hdu.data < 100)
     fig1 = plt.figure(1, figsize=(5, 5), constrained_layout=True)
 
     wcs_out, shape_out = find_optimal_celestial_wcs([(moment_0.hdu.data, w1)],
                                                     frame='galactic')
     # Rotate image
-    cont, c_footprint = reproject.reproject_interp((moment_0.hdu.data, w1),
+    cont, c_footprint = reproject.reproject_interp((max_map, w1),
                                                    wcs_out, shape_out=shape_out)
 
     ax1 = plt.subplot(1, 1, 1, projection=wcs_out)
@@ -88,15 +89,15 @@ for path, name in zip(cube_list, cube_abbreviation):
     ycen_pix, xcen_pix = y_min+20, x_max-20
     pixscale = 0.28 * u.arcsec
     ellipse_artist = my_beam.ellipse_to_plot(xcen_pix, ycen_pix, pixscale)
-    im1 = plt.imshow(cont, cmap='Greys')
+    im1 = plt.imshow(cont, cmap='Greys', vmin=-1, vmax=10)
     plt.gca().add_patch(ellipse_artist)
     ellipse_artist.set_facecolor("white")
     ellipse_artist.set_edgecolor("black")
     cb = plt.colorbar(im1, fraction=0.046, pad=0.04)
-    cb.set_label(label='Integrated Flux Density (K km/s)',
+    cb.set_label(label='Peak Flux Density (K)',
                  fontsize=10, rotation=270, labelpad=10)
     cb.ax.tick_params(which='major', labelsize=10, pad=10)
-    plt.annotate(f'Moment 0\n{name}', fontsize=10, xy=(0.02, 0.91),
+    plt.annotate(f'Max Map\n{name}', fontsize=10, xy=(0.02, 0.91),
                  xycoords="axes fraction")
     x = [x_min+10, x_min+100]
     y = [y_min+10, y_min+10]
@@ -129,6 +130,5 @@ for path, name in zip(cube_list, cube_abbreviation):
             plt.annotate(f"{regionNames[k]}",
                          (x+5, y))
         k += 1
-
-    plt.savefig(f"results/moment-maps/{name}-moment_0.pdf")
-    plt.savefig(f"results/moment-maps/{name}-moment_0.png", dpi=200)
+    plt.savefig(f"results/moment-maps/{name}-max-same.pdf")
+    plt.savefig(f"results/moment-maps/{name}-max-same.png", dpi=200)
